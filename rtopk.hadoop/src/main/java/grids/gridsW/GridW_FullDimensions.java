@@ -1,9 +1,8 @@
 package grids.gridsW;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
-
-import org.apache.hadoop.fs.Path;
 
 import algorithms.FileParser;
 import model.Cell_W;
@@ -17,7 +16,7 @@ public class GridW_FullDimensions extends GridW{
 		super();
 	}
 		
-	public GridW_FullDimensions(Path path) throws IOException {
+	public GridW_FullDimensions(URI path) throws IOException {
 		super();
 		FileParser.parseGridWFullDimentionFile(path, this);
 		segments.trimToSize();

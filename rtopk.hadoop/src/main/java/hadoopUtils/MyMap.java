@@ -8,6 +8,8 @@ import grids.gridsS.GridS_TreeDominateAndAntidominateArea;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import model.DocumentLine;
 import model.ItemType;
@@ -96,14 +98,24 @@ public class MyMap extends
 		if(context.getCacheFiles().length!=2)
 			throw new IllegalArgumentException("Files that contains the Grid for S and W is not set!!!");
 		
-		Path gridSPath = context.getLocalCacheFiles()[0];
-		Path gridWPath = context.getLocalCacheFiles()[1];
+		URI gridSPath = context.getCacheFiles()[0];
+		URI gridWPath = context.getCacheFiles()[1];
 		
 		context.setStatus("Create GridS");
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
+		
+		try {
+			gridSPath = new URI(new Path(gridSPath).getName());
+			gridWPath = new URI(new Path(gridWPath).getName());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 		
 		// create the grid for dataset S
 		//long startTime = System.nanoTime();
+		//FileSystem hdfs = FileSystem.get(context.getConfiguration());
+		//hdfs.open(gridSPath.g);
+		//BufferedReader reader = new BufferedReader();
 		switch (context.getConfiguration().get("GridForS")) {
 		case "Simple":
 			gridS = new GridS_Simple(gridSPath);
@@ -124,9 +136,9 @@ public class MyMap extends
 		//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 				
 		context.setStatus("GridS Created!!!");
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
 		context.setStatus("Create GridW");
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
 		
 		switch (context.getConfiguration().get("AlgorithmForS")) {
 		case "RealBounds":
@@ -147,7 +159,7 @@ public class MyMap extends
 		
 
 		context.setStatus("GridW Created!!!");
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
 				
 		int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
 		if (antidominateAreaElementsCount > 0) {

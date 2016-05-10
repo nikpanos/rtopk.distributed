@@ -1,9 +1,8 @@
 package grids.gridsS;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
-
-import org.apache.hadoop.fs.Path;
 
 import algorithms.FileParser;
 import algorithms.Functions;
@@ -18,7 +17,7 @@ public class GridS_Simple extends GridS {
 		super();
 	}
 	
-	public GridS_Simple(Path gridSPath) throws IOException {
+	public GridS_Simple(URI gridSPath) throws IOException {
 		super();
 		FileParser.parseGridSFile(gridSPath, this);
 		cells.trimToSize();

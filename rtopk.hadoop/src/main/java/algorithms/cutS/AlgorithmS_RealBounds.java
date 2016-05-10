@@ -4,8 +4,8 @@ import grids.gridsW.GridW_NotFullDimensions;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
+import java.net.URI;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -33,7 +33,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 	 */
 	private Cell_W reducerCell;
 		
-	public AlgorithmS_RealBounds(Path gridWPath, float[] query,
+	public AlgorithmS_RealBounds(URI gridWPath, float[] query,
 			Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
 		this.contextMapper = contextMapper;
@@ -48,7 +48,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 		//contextMapper.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
 	}
 	
-	public AlgorithmS_RealBounds(Path gridWPath, float[] query,
+	public AlgorithmS_RealBounds(URI gridWPath, float[] query,
 			Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
 		super();
 		this.query = query;

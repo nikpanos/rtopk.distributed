@@ -1,12 +1,11 @@
 package grids.gridsS;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 
 import model.Cell_S;
 import model.MyItem;
-
-import org.apache.hadoop.fs.Path;
 
 import algorithms.Dominance;
 import algorithms.FileParser;
@@ -23,7 +22,7 @@ public class GridS_DominateAndAntidominateArea extends GridS{
 		trimToSize(query);
 	}
 	
-	public GridS_DominateAndAntidominateArea(Path gridSPath,float[] query) throws IOException {
+	public GridS_DominateAndAntidominateArea(URI gridSPath, float[] query) throws IOException {
 		super();
 		FileParser.parseGridSFile(gridSPath, this);
 		trimToSize(query);

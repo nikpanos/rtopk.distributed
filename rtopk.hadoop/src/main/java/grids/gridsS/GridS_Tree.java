@@ -1,10 +1,9 @@
 package grids.gridsS;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
-
-import org.apache.hadoop.fs.Path;
 
 import algorithms.FileParser;
 import algorithms.Functions;
@@ -21,7 +20,7 @@ public class GridS_Tree extends GridS {
 		this.dimensionsNumber = dimensionsNumber;
 	}
 
-	public GridS_Tree(Path gridSPath,float[] query) throws IOException {
+	public GridS_Tree(URI gridSPath, float[] query) throws IOException {
 		super();
 		this.dimensionsNumber = query.length;
 		FileParser.parseGridSFile(gridSPath, this);

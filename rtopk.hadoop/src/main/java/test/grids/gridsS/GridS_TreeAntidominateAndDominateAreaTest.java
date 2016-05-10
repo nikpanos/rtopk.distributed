@@ -6,8 +6,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 
 import algorithms.FileParser;
@@ -20,12 +21,12 @@ import model.MyItem;
 public class GridS_TreeAntidominateAndDominateAreaTest {
 
 	@Test
-	public void test() throws IllegalArgumentException, IOException{
+	public void test() throws IllegalArgumentException, IOException, URISyntaxException{
 		
 		float[] query = new float[]{75223.44f,9977413.0f,6346881.5f,1697501.4f};
-		GridS grid = new GridS_TreeDominateAndAntidominateArea(new Path("C:\\Users\\George\\Desktop\\Suni4.grid"),query);
+		GridS grid = new GridS_TreeDominateAndAntidominateArea(new URI("C:\\Users\\George\\Desktop\\Suni4.grid"),query);
 		GridS gridSimple = new GridS_Simple();
-		FileParser.parseGridSFile(new Path("C:\\Users\\George\\Desktop\\Suni4.grid"), gridSimple);
+		FileParser.parseGridSFile(new URI("C:\\Users\\George\\Desktop\\Suni4.grid"), gridSimple);
 		
 		BufferedReader in = new BufferedReader(new FileReader(new File("C:\\Users\\George\\Desktop\\W.txt")));
 		String line;

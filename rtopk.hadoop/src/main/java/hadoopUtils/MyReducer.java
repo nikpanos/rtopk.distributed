@@ -3,6 +3,8 @@ package hadoopUtils;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import model.ItemType;
@@ -74,7 +76,12 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			q[i] = value;
 		}
 		
-		Path gridWPath = context.getLocalCacheFiles()[1];
+		URI gridWPath = context.getCacheFiles()[1];
+		try {
+			gridWPath = new URI(new Path(gridWPath).getName());
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
 		
 		switch (context.getConfiguration().get("AlgorithmForS")) {
 		case "RealBounds":
@@ -94,7 +101,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		};
 
 		context.setStatus("GridW Created!!!");
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
 		
 		String rtopkAlg = context.getConfiguration().get("AlgorithmForRtopk");
 		if (rtopkAlg.equals("BRS")) {
@@ -125,7 +132,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		algorithmCutS.setReducerKey(key.getKey().get());
 		
 		context.setStatus("Working on grid's W cell: " + key.getKey().get());
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
 		
 		long startTime = System.nanoTime();
 		

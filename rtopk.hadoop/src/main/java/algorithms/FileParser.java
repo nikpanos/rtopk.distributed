@@ -7,13 +7,12 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.util.StringTokenizer;
 
 import model.Cell_S;
 import model.Cell_W;
 import model.MyItem;
-
-import org.apache.hadoop.fs.Path;
 
 public class FileParser {
 
@@ -129,9 +128,9 @@ public class FileParser {
 	 * @param grid A Grid object
 	 * @throws IOException
 	 */
-	public static void parseGridSFile(Path path,GridS grid) throws IOException{
+	public static void parseGridSFile(URI path, GridS grid) throws IOException{
 				
-		File gridFile = new File(path.toUri().toString());
+		File gridFile = new File(path.toString());
 		
 		BufferedReader in = new BufferedReader(new FileReader(gridFile));
 		String line;
@@ -234,9 +233,9 @@ public class FileParser {
 	 * @param grid A Grid object
 	 * @throws IOException
 	 */
-	public static void parseGridWFullDimentionFile(Path path,GridW grid) throws IOException{
+	public static void parseGridWFullDimentionFile(URI path, GridW grid) throws IOException{
 				
-		File gridFile = new File(path.toUri().toString());
+		File gridFile = new File(path.toString());
 		BufferedReader in = new BufferedReader(new FileReader(gridFile));
 		String line;
 		StringTokenizer tokenizer;
@@ -337,9 +336,9 @@ public class FileParser {
 	 * @param path the path of the file that contains the Grid
 	 * @throws IOException
 	 */
-	public static void parseGridWNotFullDimentionFile(Path path,GridW grid) throws IOException{
+	public static void parseGridWNotFullDimentionFile(URI path,GridW grid) throws IOException{
 		
-		File gridFile = new File(path.toUri().toString());
+		File gridFile = new File(path.toString());
 		BufferedReader in = new BufferedReader(new FileReader(gridFile));
 		String line;
 		StringTokenizer tokenizer;

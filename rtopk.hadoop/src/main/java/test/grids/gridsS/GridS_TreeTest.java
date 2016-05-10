@@ -6,8 +6,9 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
-import org.apache.hadoop.fs.Path;
 import org.junit.Test;
 
 import algorithms.FileParser;
@@ -20,11 +21,11 @@ import model.MyItem;
 public class GridS_TreeTest {
 
 	@Test
-	public void test() throws IllegalArgumentException, IOException{
+	public void test() throws IllegalArgumentException, IOException, URISyntaxException{
 		GridS grid = new GridS_Tree(4);
-		FileParser.parseGridSFile(new Path("C:\\Users\\George\\Desktop\\Suni4.grid"), grid);
+		FileParser.parseGridSFile(new URI("C:\\Users\\George\\Desktop\\Suni4.grid"), grid);
 		GridS gridSimple = new GridS_Simple();
-		FileParser.parseGridSFile(new Path("C:\\Users\\George\\Desktop\\Suni4.grid"), gridSimple);
+		FileParser.parseGridSFile(new URI("C:\\Users\\George\\Desktop\\Suni4.grid"), gridSimple);
 		
 		float[] query = new float[]{13323434.5f,2344345.0f,13232343.5f,1434333.0f};
 		

@@ -1,11 +1,10 @@
 package grids.gridsS;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-
-import org.apache.hadoop.fs.Path;
 
 import algorithms.Dominance;
 import algorithms.FileParser;
@@ -24,7 +23,7 @@ public class GridS_TreeDominateAndAntidominateArea extends GridS {
 		this.dimensionsNumber = dimensionsNumber;
 	}
 
-	public GridS_TreeDominateAndAntidominateArea(Path gridSPath,float[] query) throws IOException {
+	public GridS_TreeDominateAndAntidominateArea(URI gridSPath, float[] query) throws IOException {
 		super();
 		this.dimensionsNumber = query.length;
 		FileParser.parseGridSFile(gridSPath, this);

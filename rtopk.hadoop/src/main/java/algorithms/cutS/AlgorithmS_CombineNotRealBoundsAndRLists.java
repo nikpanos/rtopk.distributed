@@ -1,8 +1,8 @@
 package algorithms.cutS;
 
 import java.io.IOException;
+import java.net.URI;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -29,7 +29,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 	private float[] query;
 	private Cell_W reducerCell;
 		
-	public AlgorithmS_CombineNotRealBoundsAndRLists(Path gridWPath, float[] query,
+	public AlgorithmS_CombineNotRealBoundsAndRLists(URI gridWPath, float[] query,
 			Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper,int k) throws IOException {
 		super();
 		this.contextMapper = contextMapper;
@@ -49,7 +49,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 		}
 	}
 	
-	public AlgorithmS_CombineNotRealBoundsAndRLists(Path gridWPath, float[] query,
+	public AlgorithmS_CombineNotRealBoundsAndRLists(URI gridWPath, float[] query,
 			Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
 		super();
 		this.query = query;

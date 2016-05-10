@@ -1,8 +1,8 @@
 package algorithms.cutS;
 
 import java.io.IOException;
+import java.net.URI;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
@@ -37,7 +37,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 	 * @param contextMapper @see {@link AlgorithmS_Rlists#contextMapper}
 	 * @throws IOException
 	 */
-	public AlgorithmS_Rlists(int k,Path gridWPath,Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper) throws IOException {
+	public AlgorithmS_Rlists(int k, URI gridWPath, Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
 		
 		this.contextMapper = contextMapper;
