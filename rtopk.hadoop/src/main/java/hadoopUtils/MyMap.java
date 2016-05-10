@@ -8,18 +8,22 @@ import grids.gridsS.GridS_TreeDominateAndAntidominateArea;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import model.DocumentLine;
 import model.ItemType;
 import model.MyItem;
 import model.MyKey;
 
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 import algorithms.Dominance;
 import algorithms.FileParser;
@@ -29,8 +33,7 @@ import algorithms.cutS.AlgorithmS_RealBounds;
 import algorithms.cutS.AlgorithmS_Rlists;
 import algorithms.cutS.AlgorithmsS_NotRealBounds;
 
-public class MyMap extends
-		Mapper<LongWritable, DocumentLine, MyKey, MyItem> {
+public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 
 	// The query
 	private static float[] q;
@@ -50,14 +53,14 @@ public class MyMap extends
 		
 	private static boolean antidominateAreaElementsMoreThanK;
 	
+	private boolean isReadingSFile;
+	
 	// setup executed once at the beginning of the Mapper
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html
 	@Override
-	protected void setup(
-			Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context context)
-			throws IOException, InterruptedException {
+	protected void setup(Mapper<Object, Text, MyKey, MyItem>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
-
+		
 		// initialize �
 		k = context.getConfiguration().getInt("K", 0);
 		if (k <= 0)
@@ -74,6 +77,19 @@ public class MyMap extends
 
 		if (fileName_W == null || fileName_W.trim().equals(""))
 			throw new IllegalArgumentException("FileName W is not set!!!");
+		
+		String fileName = ((FileSplit) context.getInputSplit()).getPath().getName();
+		
+		if (fileName_S.equals(fileName)) {
+			isReadingSFile = true;
+		}
+		else if (fileName_W.equals(fileName)) {
+			isReadingSFile = false;
+		}
+		else {
+			// Throw exception that the filenames are wrong
+			throw new IllegalArgumentException("Wrong Filenames!!!");
+		}
 
 		// Initialize the dimensions number of the query
 		int queryDimentions = context.getConfiguration().getInt(
@@ -101,9 +117,6 @@ public class MyMap extends
 		URI gridSPath = context.getCacheFiles()[0];
 		URI gridWPath = context.getCacheFiles()[1];
 		
-		context.setStatus("Create GridS");
-		//System.out.println(context.getStatus());
-		
 		try {
 			gridSPath = new URI(new Path(gridSPath).getName());
 			gridWPath = new URI(new Path(gridWPath).getName());
@@ -111,73 +124,77 @@ public class MyMap extends
 			e.printStackTrace();
 		}
 		
-		// create the grid for dataset S
-		//long startTime = System.nanoTime();
-		//FileSystem hdfs = FileSystem.get(context.getConfiguration());
-		//hdfs.open(gridSPath.g);
-		//BufferedReader reader = new BufferedReader();
-		switch (context.getConfiguration().get("GridForS")) {
-		case "Simple":
-			gridS = new GridS_Simple(gridSPath);
-			break;
-		case "DominateAndAntidominateArea":
-			gridS = new GridS_DominateAndAntidominateArea(gridSPath,q);			
-			break;
-		case "Tree":
-			gridS = new GridS_Tree(gridSPath,q);			
-			break;
-		case "TreeDominateAndAntidominateArea":
-			gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
-			break;	
-		default:
-			throw new IllegalArgumentException("Grid for S is not correct!!!");
-		}
-		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
-		//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
-				
-		context.setStatus("GridS Created!!!");
-		//System.out.println(context.getStatus());
-		context.setStatus("Create GridW");
-		//System.out.println(context.getStatus());
-		
-		switch (context.getConfiguration().get("AlgorithmForS")) {
-		case "RealBounds":
-			algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q, context);
-			break;
-		case "Rlists":
-			algorithmCutS = new AlgorithmS_Rlists(k,gridWPath,context);
-			break;
-		case "NotRealBounds":
-			algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q, context);
-			break;
-		case "CompineNotRealBoundsAndRLists":
-			algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context,k);
-			break;
-		default:
-			throw new IllegalArgumentException("Algorithm for S is not correct!!!");
-		};
-		
+		//if (isReadingSFile) {
+			context.setStatus("Create GridW");
+			//System.out.println(context.getStatus());
+			
+			switch (context.getConfiguration().get("AlgorithmForS")) {
+			case "RealBounds":
+				algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q, context);
+				break;
+			case "Rlists":
+				algorithmCutS = new AlgorithmS_Rlists(k, gridWPath, context);
+				break;
+			case "NotRealBounds":
+				algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q, context);
+				break;
+			case "CompineNotRealBoundsAndRLists":
+				algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context,k);
+				break;
+			default:
+				throw new IllegalArgumentException("Algorithm for S is not correct!!!");
+			};
+			
 
-		context.setStatus("GridW Created!!!");
-		//System.out.println(context.getStatus());
-				
-		int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
-		if (antidominateAreaElementsCount > 0) {
-			context.getCounter(MyCounters.S_Elements_In_Antidominance_Area_Of_GridS).setValue(antidominateAreaElementsCount);
-		}
-		if(antidominateAreaElementsCount>=k)
-			antidominateAreaElementsMoreThanK = true;
-		
+			context.setStatus("GridW Created!!!");
+			//System.out.println(context.getStatus());
+		//}
+		//else {
+			context.setStatus("Create GridS");
+			//System.out.println(context.getStatus());
+			
+			// create the grid for dataset S
+			//long startTime = System.nanoTime();
+			//FileSystem hdfs = FileSystem.get(context.getConfiguration());
+			//hdfs.open(gridSPath.g);
+			//BufferedReader reader = new BufferedReader();
+			switch (context.getConfiguration().get("GridForS")) {
+			case "Simple":
+				gridS = new GridS_Simple(gridSPath);
+				break;
+			case "DominateAndAntidominateArea":
+				gridS = new GridS_DominateAndAntidominateArea(gridSPath,q);			
+				break;
+			case "Tree":
+				gridS = new GridS_Tree(gridSPath,q);			
+				break;
+			case "TreeDominateAndAntidominateArea":
+				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
+				break;	
+			default:
+				throw new IllegalArgumentException("Grid for S is not correct!!!");
+			}
+			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
+			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
+					
+			context.setStatus("GridS Created!!!");
+			//System.out.println(context.getStatus());
+			
+			int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
+			if (antidominateAreaElementsCount > 0) {
+				context.getCounter(MyCounters.S_Elements_In_Antidominance_Area_Of_GridS).setValue(antidominateAreaElementsCount);
+			}
+			if(antidominateAreaElementsCount >= k)
+				antidominateAreaElementsMoreThanK = true;
+		//}
 	}
 
-	public void map(LongWritable key, DocumentLine value, Context context)
-			throws IOException, InterruptedException {
-
-		MyItem item = FileParser.parseDatasetElement(value.getText().toString());
-
+	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+		try {
+		MyItem item = FileParser.parseDatasetElement(value.toString());
+		
 		// If the current element belongs to dataset S, then...
-		if (fileName_S.equals(value.getFile().toString())) {
-			
+		if (isReadingSFile) {
 			long startTime = System.nanoTime();
 			
 			item.setItemType(ItemType.S);
@@ -200,7 +217,7 @@ public class MyMap extends
 
 		}
 		// Else if the current element belongs to dataset W, then...
-		else if (fileName_W.equals(value.getFile().toString())) {
+		else {
 			
 			long startTime = System.nanoTime();
 			
@@ -229,13 +246,28 @@ public class MyMap extends
 
 			
 		}
-		// Else if the current element is not S or W, then...
-		else {
-			// Throw exception that the filenames are wrong
-			throw new IllegalArgumentException("Wrong Filenames!!!");
 		}
-				
-
+		catch (Exception ex) {
+			FileSystem fs = FileSystem.get(context.getConfiguration());
+			try {
+				Path filenamePath = new Path("/user/nikitopoulos/debug/error.txt");  
+				if ( !fs.exists( filenamePath )) {
+					OutputStream os = fs.create(filenamePath);
+					PrintWriter pw = new PrintWriter( new OutputStreamWriter( os, "UTF-8" ) );
+					try {
+						pw.write(ex.toString() + "\n");
+						pw.write(ex.getMessage() + "\n");
+						ex.printStackTrace(pw);
+					}
+					finally {
+						pw.close();
+					}
+				}
+			}
+			finally {
+				fs.close();
+			}
+		}
 	}
 
 	public void run(Context context) throws IOException, InterruptedException {
@@ -256,7 +288,7 @@ public class MyMap extends
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html
 	@Override
 	protected void cleanup(
-			Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context context)
+			Mapper<Object, Text, MyKey, MyItem>.Context context)
 			throws IOException, InterruptedException {
 		super.cleanup(context);
 	}

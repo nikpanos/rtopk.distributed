@@ -4,14 +4,12 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import grids.gridsW.GridW_FullDimensions;
 import hadoopUtils.counters.MyCounters;
-import model.DocumentLine;
 import model.MyItem;
 import model.MyKey;
 import model.MyListItem;
@@ -26,7 +24,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 	/**
 	 * The Mapper's context 
 	 */
-	private Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper;
+	private Mapper<Object, Text, MyKey, MyItem>.Context contextMapper;
 		
 	/**
 	 * <h1>Constructor for Map phase</h1>
@@ -37,7 +35,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 	 * @param contextMapper @see {@link AlgorithmS_Rlists#contextMapper}
 	 * @throws IOException
 	 */
-	public AlgorithmS_Rlists(int k, URI gridWPath, Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper) throws IOException {
+	public AlgorithmS_Rlists(int k, URI gridWPath, Mapper<Object, Text, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
 		
 		this.contextMapper = contextMapper;

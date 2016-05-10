@@ -7,24 +7,22 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import algorithms.Functions;
 import model.Cell_W;
-import model.DocumentLine;
 import model.MyItem;
 import model.MyKey;
 
 public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 
-	private Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper;
+	private Mapper<Object, Text, MyKey, MyItem>.Context contextMapper;
 	private float[] query;
 	private Cell_W reducerCell;
 		
-	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query, Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper) throws IOException {
+	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query, Mapper<Object, Text, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
 		this.contextMapper = contextMapper;
 		this.query = query;

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 
 import org.apache.hadoop.io.IntWritable;
-import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -13,7 +12,6 @@ import algorithms.Functions;
 import grids.gridsW.GridW_FullDimensions;
 import hadoopUtils.counters.MyCounters;
 import model.Cell_W;
-import model.DocumentLine;
 import model.MyItem;
 import model.MyKey;
 import model.MyListItem;
@@ -25,12 +23,12 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 	 */
 	private MyListItem[] lists;
 	
-	private Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper;
+	private Mapper<Object, Text, MyKey, MyItem>.Context contextMapper;
 	private float[] query;
 	private Cell_W reducerCell;
 		
 	public AlgorithmS_CombineNotRealBoundsAndRLists(URI gridWPath, float[] query,
-			Mapper<LongWritable, DocumentLine, MyKey, MyItem>.Context contextMapper,int k) throws IOException {
+			Mapper<Object, Text, MyKey, MyItem>.Context contextMapper,int k) throws IOException {
 		super();
 		this.contextMapper = contextMapper;
 		this.query = query;

@@ -10,10 +10,9 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Counter;
 import org.apache.hadoop.mapreduce.CounterGroup;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
-import hadoopUtils.input.CombineDocumentLineInputFormat;
 import model.MyItem;
 import model.MyKey;
 
@@ -81,18 +80,21 @@ public class MyMapReduceDriver {
 
 		job.setMapperClass(MyMap.class);
 		job.setReducerClass(MyReducer.class);
+		
+		FileInputFormat.addInputPath(job, pathS);
+		FileInputFormat.addInputPath(job, pathW);
 
 		// 64 MB, default block size on hadoop, I did that in order to have
 		// locality
 		// http://hadoop.apache.org/docs/r2.6.0/api/org/apache/hadoop/mapred/lib/CombineFileInputFormat.html
-		CombineDocumentLineInputFormat.setMaxInputSplitSize(job, 67108864);
+		//CombineDocumentLineInputFormat.setMaxInputSplitSize(job, 67108864);
 
-		job.setInputFormatClass(CombineDocumentLineInputFormat.class);
-		job.setOutputFormatClass(TextOutputFormat.class);
+		//job.setInputFormatClass(CombineDocumentLineInputFormat.class);
+		//job.setOutputFormatClass(TextOutputFormat.class);
 		
 		job.setNumReduceTasks(reducersNo);
 
-		CombineDocumentLineInputFormat.setInputPaths(job, pathS, pathW);
+		//CombineDocumentLineInputFormat.setInputPaths(job, pathS, pathW);
 
 		FileOutputFormat.setOutputPath(job, pathOutput);
 
