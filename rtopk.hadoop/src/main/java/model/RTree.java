@@ -164,7 +164,7 @@ public class RTree {
 		assert (dimensions.length == dimension_count);
 		Node l = findLeaf(root, coords, dimensions, entry);
 		if (l == null) {
-			//System.out.println("WTF?");
+			System.out.println("WTF?");
 			findLeaf(root, coords, dimensions, entry);
 		}
 		assert (l != null) : "Could not find leaf for entry to delete";

@@ -8,9 +8,6 @@ import grids.gridsS.GridS_TreeDominateAndAntidominateArea;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -18,9 +15,7 @@ import model.ItemType;
 import model.MyItem;
 import model.MyKey;
 
-import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
@@ -53,7 +48,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		
 	private static boolean antidominateAreaElementsMoreThanK;
 	
-	private boolean isReadingSFile;
+	private boolean isReadingS;
 	
 	// setup executed once at the beginning of the Mapper
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html
@@ -78,13 +73,13 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		if (fileName_W == null || fileName_W.trim().equals(""))
 			throw new IllegalArgumentException("FileName W is not set!!!");
 		
-		String fileName = ((FileSplit) context.getInputSplit()).getPath().getName();
+		String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
 		
-		if (fileName_S.equals(fileName)) {
-			isReadingSFile = true;
+		if (filename.equals(fileName_S)) {
+			isReadingS = true;
 		}
-		else if (fileName_W.equals(fileName)) {
-			isReadingSFile = false;
+		else if (filename.equals(fileName_W)) {
+			isReadingS = false;
 		}
 		else {
 			// Throw exception that the filenames are wrong
@@ -118,46 +113,18 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		URI gridWPath = context.getCacheFiles()[1];
 		
 		try {
-			gridSPath = new URI(new Path(gridSPath).getName());
-			gridWPath = new URI(new Path(gridWPath).getName());
-		} catch (URISyntaxException e) {
+			gridSPath = new URI(new Path(gridSPath.getPath()).getName());
+			gridWPath = new URI(new Path(gridWPath.getPath()).getName());
+		} catch (IllegalArgumentException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		
-		//if (isReadingSFile) {
-			context.setStatus("Create GridW");
-			//System.out.println(context.getStatus());
-			
-			switch (context.getConfiguration().get("AlgorithmForS")) {
-			case "RealBounds":
-				algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q, context);
-				break;
-			case "Rlists":
-				algorithmCutS = new AlgorithmS_Rlists(k, gridWPath, context);
-				break;
-			case "NotRealBounds":
-				algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q, context);
-				break;
-			case "CompineNotRealBoundsAndRLists":
-				algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context,k);
-				break;
-			default:
-				throw new IllegalArgumentException("Algorithm for S is not correct!!!");
-			};
-			
-
-			context.setStatus("GridW Created!!!");
-			//System.out.println(context.getStatus());
-		//}
-		//else {
+		if (!isReadingS) {
 			context.setStatus("Create GridS");
-			//System.out.println(context.getStatus());
+			System.out.println(context.getStatus());
 			
 			// create the grid for dataset S
 			//long startTime = System.nanoTime();
-			//FileSystem hdfs = FileSystem.get(context.getConfiguration());
-			//hdfs.open(gridSPath.g);
-			//BufferedReader reader = new BufferedReader();
 			switch (context.getConfiguration().get("GridForS")) {
 			case "Simple":
 				gridS = new GridS_Simple(gridSPath);
@@ -178,23 +145,50 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 					
 			context.setStatus("GridS Created!!!");
-			//System.out.println(context.getStatus());
+			System.out.println(context.getStatus());
 			
 			int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
 			if (antidominateAreaElementsCount > 0) {
 				context.getCounter(MyCounters.S_Elements_In_Antidominance_Area_Of_GridS).setValue(antidominateAreaElementsCount);
 			}
-			if(antidominateAreaElementsCount >= k)
+			if(antidominateAreaElementsCount>=k)
 				antidominateAreaElementsMoreThanK = true;
-		//}
+		
+		}
+		else {
+			context.setStatus("Create GridW");
+			System.out.println(context.getStatus());
+			
+			switch (context.getConfiguration().get("AlgorithmForS")) {
+			case "RealBounds":
+				algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q, context);
+				break;
+			case "Rlists":
+				algorithmCutS = new AlgorithmS_Rlists(k,gridWPath,context);
+				break;
+			case "NotRealBounds":
+				algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q, context);
+				break;
+			case "CompineNotRealBoundsAndRLists":
+				algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context,k);
+				break;
+			default:
+				throw new IllegalArgumentException("Algorithm for S is not correct!!!");
+			};
+			
+	
+			context.setStatus("GridW Created!!!");
+			System.out.println(context.getStatus());
+		}
 	}
 
 	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-		try {
+
 		MyItem item = FileParser.parseDatasetElement(value.toString());
 		
 		// If the current element belongs to dataset S, then...
-		if (isReadingSFile) {
+		if (isReadingS) {
+			
 			long startTime = System.nanoTime();
 			
 			item.setItemType(ItemType.S);
@@ -224,49 +218,25 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			item.setItemType(ItemType.W);
 			context.getCounter(MyCounters.W).increment(1);
 			
-			int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
+			int reducerNumber = AlgorithmCutS.getReducerNumber(item, 10);
 			
 			int[] range = gridS.getCount(item, q);
 			
-			if(k<range[0])
+			if(k < range[0])
 				context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
-			else if(range[1]<k) {
+			else if(range[1] < k) {
 				item.setItemType(ItemType.W_InTopK);
-				context.write(new MyKey(new IntWritable(reducerNumber),item.getItemType()), item);
+				context.write(new MyKey(reducerNumber, item.getItemType()), item);
 				context.getCounter(MyCounters.W_in_RTOPk).increment(1);
 			}
 			else {
-				context.write(new MyKey(new IntWritable(reducerNumber),item.getItemType()), item);
+				context.write(new MyKey(reducerNumber, item.getItemType()), item);
 				context.getCounter(MyCounters.W1).increment(1);
 			}
 			
 			long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			
 			context.getCounter(MyCounters.Total_effort_for_pruning_W_in_MilliSeconds).increment(estimatedTime);
-
-			
-		}
-		}
-		catch (Exception ex) {
-			FileSystem fs = FileSystem.get(context.getConfiguration());
-			try {
-				Path filenamePath = new Path("/user/nikitopoulos/debug/error.txt");  
-				if ( !fs.exists( filenamePath )) {
-					OutputStream os = fs.create(filenamePath);
-					PrintWriter pw = new PrintWriter( new OutputStreamWriter( os, "UTF-8" ) );
-					try {
-						pw.write(ex.toString() + "\n");
-						pw.write(ex.getMessage() + "\n");
-						ex.printStackTrace(pw);
-					}
-					finally {
-						pw.close();
-					}
-				}
-			}
-			finally {
-				fs.close();
-			}
 		}
 	}
 
@@ -275,8 +245,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		try {
 			if (!antidominateAreaElementsMoreThanK) {
 				while (context.nextKeyValue()) {
-					map(context.getCurrentKey(), context.getCurrentValue(),
-							context);
+					map(context.getCurrentKey(), context.getCurrentValue(), context);
 				}
 			}
 		} finally {
@@ -287,9 +256,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	// Cleanup executed once at the end of the Mapper
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html
 	@Override
-	protected void cleanup(
-			Mapper<Object, Text, MyKey, MyItem>.Context context)
-			throws IOException, InterruptedException {
+	protected void cleanup(Mapper<Object, Text, MyKey, MyItem>.Context context) throws IOException, InterruptedException {
 		super.cleanup(context);
 	}
 

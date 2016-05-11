@@ -9,7 +9,7 @@ public class MyPartitioner extends Partitioner<MyKey, MyItem>{
 
 	@Override
 	public int getPartition(MyKey key, MyItem value, int numPartitions) {
-		return key.getKey().get();
+		return key.getKey();
 	}
 
 }

@@ -6,7 +6,6 @@ import hadoopUtils.counters.MyCounters;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -36,8 +35,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 		//contextMapper.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
 	}
 	
-	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query,
-			Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
+	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query, Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
 		super();
 		this.query = query;
 		
@@ -58,7 +56,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 					<= Functions.calculateScore(grid.getSegments().get(i).getUpperBound(), query)){
 				
 				contextMapper.getCounter(MyCounters.S2).increment(1);
-				contextMapper.write(new MyKey(new IntWritable(grid.getSegments().get(i).getId()),s.getItemType()), s);
+				contextMapper.write(new MyKey(grid.getSegments().get(i).getId(),s.getItemType()), s);
 			}
 			else
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);

@@ -3,7 +3,6 @@ package algorithms.cutS;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -71,7 +70,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 		for (int i = 0; i < lists.length; i++) {
 			
 			if (lists[i].add(s)) {
-				contextMapper.write(new MyKey(new IntWritable(lists[i].getSegment().getId()), s.getItemType()), s);
+				contextMapper.write(new MyKey(lists[i].getSegment().getId(), s.getItemType()), s);
 				contextMapper.getCounter(MyCounters.S2).increment(1);
 			} else
 				contextMapper.getCounter(MyCounters.S2_pruned_by_RLists).increment(1);

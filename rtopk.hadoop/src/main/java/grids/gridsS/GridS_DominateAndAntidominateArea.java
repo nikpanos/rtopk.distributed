@@ -22,7 +22,7 @@ public class GridS_DominateAndAntidominateArea extends GridS{
 		trimToSize(query);
 	}
 	
-	public GridS_DominateAndAntidominateArea(URI gridSPath, float[] query) throws IOException {
+	public GridS_DominateAndAntidominateArea(URI gridSPath,float[] query) throws IOException {
 		super();
 		FileParser.parseGridSFile(gridSPath, this);
 		trimToSize(query);

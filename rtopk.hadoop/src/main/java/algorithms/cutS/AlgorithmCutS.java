@@ -53,4 +53,18 @@ public abstract class AlgorithmCutS {
 	 */
 	abstract public boolean isInLocalAntidominateArea(MyItem s);
 	
+	public static int getReducerNumber(MyItem w, double segments) {
+		int cellDescriptor;
+		double step = 1d / segments;
+		
+		int result = 0;
+		float[] fields = w.getFields();
+		for (int i = 0; i < fields.length; i++) {
+			cellDescriptor = (int) (fields[i] / step);
+			result += cellDescriptor * Math.pow(segments, i);
+		}
+		
+		return result;
+	}
+	
 }

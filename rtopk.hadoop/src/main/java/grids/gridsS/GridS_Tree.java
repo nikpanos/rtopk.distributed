@@ -20,7 +20,7 @@ public class GridS_Tree extends GridS {
 		this.dimensionsNumber = dimensionsNumber;
 	}
 
-	public GridS_Tree(URI gridSPath, float[] query) throws IOException {
+	public GridS_Tree(URI gridSPath,float[] query) throws IOException {
 		super();
 		this.dimensionsNumber = query.length;
 		FileParser.parseGridSFile(gridSPath, this);

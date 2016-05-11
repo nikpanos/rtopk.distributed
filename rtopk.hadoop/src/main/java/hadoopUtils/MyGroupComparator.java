@@ -17,6 +17,6 @@ public class MyGroupComparator extends WritableComparator{
 	public int compare(WritableComparable a, WritableComparable b) {
 		MyKey key1 = (MyKey) a;
 		MyKey key2 = (MyKey) b;
-		return key1.getKey().compareTo(key2.getKey());
+		return key1.getKey() - key2.getKey();
 	}
 }

@@ -41,11 +41,11 @@ public class MyMapReduceDriver {
 			throws IOException, ClassNotFoundException, InterruptedException {
 		Job job = Job.getInstance();
 
-		job.getConfiguration().set("mapreduce.map.memory.mb", "4608");
-		job.getConfiguration().set("mapred.map.child.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx4294967296");
+		job.getConfiguration().set("mapreduce.map.memory.mb", "2560");
+		job.getConfiguration().set("mapred.map.child.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2147483648");
 
-		job.getConfiguration().set("mapreduce.reduce.memory.mb", "4608");
-		job.getConfiguration().set("mapred.reduce.child.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx4294967296");
+		job.getConfiguration().set("mapreduce.reduce.memory.mb", "2560");
+		job.getConfiguration().set("mapred.reduce.child.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2147483648");
 		
 		long milliSeconds = 1000 * 60 * 60 * 3; //3 hours
 		//job.getConfiguration().setLong("mapreduce.task.timeout", milliSeconds);
@@ -80,9 +80,6 @@ public class MyMapReduceDriver {
 
 		job.setMapperClass(MyMap.class);
 		job.setReducerClass(MyReducer.class);
-		
-		FileInputFormat.addInputPath(job, pathS);
-		FileInputFormat.addInputPath(job, pathW);
 
 		// 64 MB, default block size on hadoop, I did that in order to have
 		// locality
@@ -96,6 +93,8 @@ public class MyMapReduceDriver {
 
 		//CombineDocumentLineInputFormat.setInputPaths(job, pathS, pathW);
 
+		FileInputFormat.addInputPath(job, pathS);
+		FileInputFormat.addInputPath(job, pathW);
 		FileOutputFormat.setOutputPath(job, pathOutput);
 
 		@SuppressWarnings("unused")

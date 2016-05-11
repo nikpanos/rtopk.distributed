@@ -128,7 +128,7 @@ public class FileParser {
 	 * @param grid A Grid object
 	 * @throws IOException
 	 */
-	public static void parseGridSFile(URI path, GridS grid) throws IOException{
+	public static void parseGridSFile(URI path,GridS grid) throws IOException{
 				
 		File gridFile = new File(path.toString());
 		
@@ -233,7 +233,7 @@ public class FileParser {
 	 * @param grid A Grid object
 	 * @throws IOException
 	 */
-	public static void parseGridWFullDimentionFile(URI path, GridW grid) throws IOException{
+	public static void parseGridWFullDimentionFile(URI path,GridW grid) throws IOException{
 				
 		File gridFile = new File(path.toString());
 		BufferedReader in = new BufferedReader(new FileReader(gridFile));

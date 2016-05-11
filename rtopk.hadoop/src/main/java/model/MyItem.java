@@ -151,7 +151,7 @@ public class MyItem implements Writable {
 	@Override
 	public void readFields(DataInput input) throws IOException {
 		id = input.readLong();
-		int type = input.readInt();
+		int type = input.readByte();
 		if (type == 0)
 			itemType = ItemType.W;
 		else if (type == 1)
@@ -159,7 +159,7 @@ public class MyItem implements Writable {
 		else
 			itemType = ItemType.W_InTopK;
 		
-		values = new float[input.readInt()];
+		values = new float[input.readByte()];
 		for (int i = 0; i < values.length; i++) {
 			values[i] = input.readFloat();
 		}
@@ -168,8 +168,8 @@ public class MyItem implements Writable {
 	@Override
 	public void write(DataOutput output) throws IOException {
 		output.writeLong(id);
-		output.writeInt(itemType.getValue());
-		output.writeInt(values.length);
+		output.writeByte(itemType.getValue());
+		output.writeByte(values.length);
 		for (int i = 0; i < values.length; i++) {
 			output.writeFloat(values[i]);
 		}

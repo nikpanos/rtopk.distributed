@@ -78,8 +78,8 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		
 		URI gridWPath = context.getCacheFiles()[1];
 		try {
-			gridWPath = new URI(new Path(gridWPath).getName());
-		} catch (URISyntaxException e) {
+			gridWPath = new URI(new Path(gridWPath.getPath()).getName());
+		} catch (IllegalArgumentException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		
@@ -101,7 +101,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		};
 
 		context.setStatus("GridW Created!!!");
-		//System.out.println(context.getStatus());
+		System.out.println(context.getStatus());
 		
 		String rtopkAlg = context.getConfiguration().get("AlgorithmForRtopk");
 		if (rtopkAlg.equals("BRS")) {
@@ -129,10 +129,10 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			rta = new Rta();
 		}
 		
-		algorithmCutS.setReducerKey(key.getKey().get());
+		algorithmCutS.setReducerKey(key.getKey());
 		
-		context.setStatus("Working on grid's W cell: " + key.getKey().get());
-		//System.out.println(context.getStatus());
+		context.setStatus("Working on grid's W cell: " + key.getKey());
+		System.out.println(context.getStatus());
 		
 		long startTime = System.nanoTime();
 		

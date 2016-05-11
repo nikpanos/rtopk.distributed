@@ -15,12 +15,13 @@ public class MyCompositeKeyComparator extends WritableComparator {
     	MyKey k1 = (MyKey)w1;
     	MyKey k2 = (MyKey)w2;
          
-    	int tmp = k2.getKey().compareTo(k1.getKey());
+    	int tmp = k2.getKey() - k1.getKey();
         
-    	if (tmp != 0)
-			return tmp;
+    	if (tmp == 0) {
+    		return -(k1.getType().getValue() - k2.getType().getValue());
+    	}
     	
-    	return -(k1.getType().getValue() - k2.getType().getValue());
+    	return tmp;
 
 		/*if (k2.getType() == ItemType.S) {
 			if (k1.getType() == ItemType.W_InTopK) {

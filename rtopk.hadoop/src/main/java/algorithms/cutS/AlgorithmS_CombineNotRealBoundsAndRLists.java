@@ -3,7 +3,6 @@ package algorithms.cutS;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
@@ -70,7 +69,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 				
 				if(lists[i].add(s)){
 					contextMapper.getCounter(MyCounters.S2).increment(1);
-					contextMapper.write(new MyKey(new IntWritable(grid.getSegments().get(i).getId()),s.getItemType()), s);
+					contextMapper.write(new MyKey(grid.getSegments().get(i).getId(),s.getItemType()), s);
 				}
 				else
 					contextMapper.getCounter(MyCounters.S2_pruned_by_RLists).increment(1);
