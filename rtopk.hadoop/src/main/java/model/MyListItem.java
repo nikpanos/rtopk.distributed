@@ -1,8 +1,7 @@
 package model;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
+import java.util.PriorityQueue;
 
 import algorithms.Functions;
 
@@ -10,7 +9,7 @@ public class MyListItem {
 
 	private Cell_W segment;
 	private Comparator<MyItem> comparator;
-	private ArrayList<MyItem> kList;
+	private PriorityQueue<MyItem> kList;
 	private int k;
 
 	/**
@@ -22,7 +21,11 @@ public class MyListItem {
 		comparator = new K_List_Comparator(segment);
 		this.segment = segment;
 		this.k = k;
-		kList = new ArrayList<MyItem>(k + 1);
+		kList = new PriorityQueue<MyItem>(k + 1, comparator);
+		
+		//PriorityQueue<MyItem> queue = new PriorityQueue<MyItem>(comparator);
+		//queue.
+		
 	}
 
 	
@@ -61,25 +64,21 @@ public class MyListItem {
 	public boolean add(MyItem s) {
 		
 		if (kList.size() >= k) {
-			if (Functions.calculateScore(segment.getUpperBound(),
-					kList.get(kList.size() - 1)) < Functions.calculateScore(
-					segment.getLowerBound(), s))
+			double tempScore = Functions.calculateScore(segment.getUpperBound(), kList.peek());
+			if (tempScore < Functions.calculateScore(segment.getLowerBound(), s))
 				return false;
 			else {
-				if(Functions.calculateScore(segment.getUpperBound(),
-					kList.get(kList.size() - 1)) > Functions.calculateScore(
-					segment.getUpperBound(), s)) {
-					
+				if(tempScore > Functions.calculateScore(segment.getUpperBound(), s)) {
 					kList.add(s);
-					Collections.sort(kList, comparator);
-					kList.remove(kList.size()-1);
+					//Collections.sort(kList, comparator);
+					kList.remove();
 				}
 				return true;
 			}
 		} 
 		else {
 			kList.add(s);
-			Collections.sort(kList, comparator);
+			//Collections.sort(kList, comparator);
 			return true;
 		}
 		
@@ -103,15 +102,13 @@ public class MyListItem {
 
 		@Override
 		public int compare(MyItem item1, MyItem item2) {			
-			double diff = Functions.calculateScore(segment.getUpperBound(),
-					item1)
-					- Functions.calculateScore(segment.getUpperBound(), item2);
+			double diff = Functions.calculateScore(segment.getUpperBound(), item1) -
+							Functions.calculateScore(segment.getUpperBound(), item2);
 			if (diff > 0)
-				return -1;
-			else if (diff < 0)
 				return 1;
-			else
-				return 0;
+			else if (diff < 0)
+				return -1;
+			return 0;
 		}
 
 	}

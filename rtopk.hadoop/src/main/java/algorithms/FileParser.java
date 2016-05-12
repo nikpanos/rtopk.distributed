@@ -253,12 +253,11 @@ public class FileParser {
 			int dimensionsNumber = (tokenizer.countTokens()-1)/2;
 			
 			// Read the cell's id which found in the first column of the line
-			@SuppressWarnings("unused")
 			int idn = Integer.parseInt(tokenizer.nextToken());
 			
 			
 			//Initialize a cell
-			Cell_W cell = new Cell_W(id,dimensionsNumber);
+			Cell_W cell = new Cell_W(id, dimensionsNumber, idn);
 			
 			// Initialize a counter, in order to know the current dimension
 			int i = 0;
@@ -357,11 +356,10 @@ public class FileParser {
 			int dimensionsNumber = (tokenizer.countTokens()-1+2)/2;
 			
 			// Read the cell's id which found in the first column of the line
-			@SuppressWarnings("unused")
 			int idn = Integer.parseInt(tokenizer.nextToken());
 			
 			//Initialize a cell
-			Cell_W cell = new Cell_W(id,dimensionsNumber);
+			Cell_W cell = new Cell_W(id, dimensionsNumber, idn);
 			
 			// Initialize a counter, in order to know the current dimension
 			int i = 0;

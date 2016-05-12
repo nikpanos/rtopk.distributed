@@ -50,11 +50,15 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	
 	private boolean isReadingS;
 	
+	private int segmentation;
+	
 	// setup executed once at the beginning of the Mapper
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html
 	@Override
 	protected void setup(Mapper<Object, Text, MyKey, MyItem>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
+		
+		segmentation = context.getConfiguration().getInt("segmentation", 10);
 		
 		// initialize �
 		k = context.getConfiguration().getInt("K", 0);
@@ -155,7 +159,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 				antidominateAreaElementsMoreThanK = true;
 		
 		}
-		else {
+		//else {
 			context.setStatus("Create GridW");
 			System.out.println(context.getStatus());
 			
@@ -170,7 +174,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 				algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q, context);
 				break;
 			case "CompineNotRealBoundsAndRLists":
-				algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context,k);
+				algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context, k);
 				break;
 			default:
 				throw new IllegalArgumentException("Algorithm for S is not correct!!!");
@@ -179,13 +183,12 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	
 			context.setStatus("GridW Created!!!");
 			System.out.println(context.getStatus());
-		}
+		//}
 	}
 
 	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-
-		MyItem item = FileParser.parseDatasetElement(value.toString());
 		
+		MyItem item = FileParser.parseDatasetElement(value.toString());
 		// If the current element belongs to dataset S, then...
 		if (isReadingS) {
 			
@@ -218,7 +221,8 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			item.setItemType(ItemType.W);
 			context.getCounter(MyCounters.W).increment(1);
 			
-			int reducerNumber = AlgorithmCutS.getReducerNumber(item, 10);
+			//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
+			int reducerNumber = algorithmCutS.getReducerNumber(item, segmentation);
 			
 			int[] range = gridS.getCount(item, q);
 			

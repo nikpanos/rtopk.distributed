@@ -41,11 +41,13 @@ public class MyMapReduceDriver {
 			throws IOException, ClassNotFoundException, InterruptedException {
 		Job job = Job.getInstance();
 
-		job.getConfiguration().set("mapreduce.map.memory.mb", "2560");
-		job.getConfiguration().set("mapred.map.child.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2147483648");
+		//job.getConfiguration().set("mapreduce.map.memory.mb", "2560");
+		//job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2147483648");
+		//mapreduce.map.java.opts
 
-		job.getConfiguration().set("mapreduce.reduce.memory.mb", "2560");
-		job.getConfiguration().set("mapred.reduce.child.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2147483648");
+		//job.getConfiguration().set("mapreduce.reduce.memory.mb", "5632");
+		//job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx4224m -Xms512m");
+		//mapreduce.reduce.java.opts
 		
 		long milliSeconds = 1000 * 60 * 60 * 3; //3 hours
 		//job.getConfiguration().setLong("mapreduce.task.timeout", milliSeconds);

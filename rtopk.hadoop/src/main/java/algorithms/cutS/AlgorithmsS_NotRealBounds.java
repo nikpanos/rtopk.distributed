@@ -50,13 +50,13 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 	
 	@Override
 	public void sendToReducer(MyItem s) throws IOException, InterruptedException {
+		Cell_W segment;
 		for (int i=0;i<grid.getSegments().size();i++) {
+			segment = grid.getSegments().get(i);
 			// if is not in dominate area
-			if(Functions.calculateScore(grid.getSegments().get(i).getLowerBound(), s) 
-					<= Functions.calculateScore(grid.getSegments().get(i).getUpperBound(), query)){
-				
+			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
 				contextMapper.getCounter(MyCounters.S2).increment(1);
-				contextMapper.write(new MyKey(grid.getSegments().get(i).getId(),s.getItemType()), s);
+				contextMapper.write(new MyKey(segment.getId(), s.getItemType()), s);
 			}
 			else
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);

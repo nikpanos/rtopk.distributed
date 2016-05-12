@@ -5,17 +5,19 @@ import java.util.Arrays;
 public class Cell_W {
 
 	private int id;
+	private int tupleId;
 	private float[] lowerBound;
 	private float[] upperBound;
 	
 	/**
 	 * @param dimensionsNumber the number of dimensions
 	 */
-	public Cell_W(int id,int dimensionsNumber) {
+	public Cell_W(int id, int dimensionsNumber, int tupleId) {
 		super();
 		this.id = id;
 		lowerBound = new float[dimensionsNumber];
 		upperBound = new float[dimensionsNumber];
+		this.tupleId = tupleId;
 	}
 
 	/**
@@ -67,6 +69,14 @@ public class Cell_W {
 	public String toString() {
 		return "Cell_W [lowerBound=" + Arrays.toString(lowerBound)
 				+ ", upperBound=" + Arrays.toString(upperBound) + "]";
+	}
+
+	public int getTupleId() {
+		return tupleId;
+	}
+
+	public void setTupleId(int tupleId) {
+		this.tupleId = tupleId;
 	}
 
 	

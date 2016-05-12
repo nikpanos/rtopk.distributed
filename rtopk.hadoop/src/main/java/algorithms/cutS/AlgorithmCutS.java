@@ -1,11 +1,16 @@
 package algorithms.cutS;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 
 import grids.gridsW.GridW;
+import model.Cell_W;
 import model.MyItem;
 
 public abstract class AlgorithmCutS {
+	
+	private static CellComparator comparator = new CellComparator();
 
 	/**
 	 * The grid that the algorithm use
@@ -53,18 +58,27 @@ public abstract class AlgorithmCutS {
 	 */
 	abstract public boolean isInLocalAntidominateArea(MyItem s);
 	
-	public static int getReducerNumber(MyItem w, double segments) {
+	public int getReducerNumber(MyItem w, double segments) {
 		int cellDescriptor;
-		double step = 1d / segments;
+		double step = 1.0 / segments;
 		
-		int result = 0;
+		int tupleCellId = 0;
 		float[] fields = w.getFields();
 		for (int i = 0; i < fields.length; i++) {
 			cellDescriptor = (int) (fields[i] / step);
-			result += cellDescriptor * Math.pow(segments, i);
+			tupleCellId += cellDescriptor * Math.pow(segments, i);
 		}
 		
-		return result;
+		int result = Collections.binarySearch(grid.getSegments(), new Cell_W(0, 0, tupleCellId), comparator);
+		
+		return grid.getSegments().get(result).getId();
+	}
+	
+	private static class CellComparator implements Comparator<Cell_W> {
+		@Override
+		public int compare(Cell_W item1, Cell_W item2) {			
+			return item1.getTupleId() - item2.getTupleId();
+		}
 	}
 	
 }
