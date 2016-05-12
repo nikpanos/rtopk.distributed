@@ -50,7 +50,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	
 	private boolean isReadingS;
 	
-	private int segmentation;
+	private int gridWSegmentation;
 	
 	// setup executed once at the beginning of the Mapper
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html
@@ -58,7 +58,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	protected void setup(Mapper<Object, Text, MyKey, MyItem>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
 		
-		segmentation = context.getConfiguration().getInt("segmentation", 10);
+		gridWSegmentation = context.getConfiguration().getInt("gridWSegmentation", 10);
 		
 		// initialize �
 		k = context.getConfiguration().getInt("K", 0);
@@ -222,7 +222,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			context.getCounter(MyCounters.W).increment(1);
 			
 			//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
-			int reducerNumber = algorithmCutS.getReducerNumber(item, segmentation);
+			int reducerNumber = algorithmCutS.getReducerNumber(item, gridWSegmentation);
 			
 			int[] range = gridS.getCount(item, q);
 			

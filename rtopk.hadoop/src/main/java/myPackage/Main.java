@@ -61,10 +61,11 @@ public class Main {
 		String algorithmForRtopk = properties.getProperty("AlgorithmForRtopk");
 		String gridForS = properties.getProperty("GridForS");
 		String jobName = properties.getProperty("JobName");
+		int gridWSegmentation = Integer.parseInt(properties.getProperty("gridWSegmentation"));
 
 		MyMapReduceDriver driver = new MyMapReduceDriver();
 		driver.computeRTOPk(k, pathS, pathGridS, pathW, pathGridW, pathOutput, query, reducersNo, algorithmForS,
-				gridForS, algorithmForRtopk, jobName);
+				gridForS, algorithmForRtopk, gridWSegmentation, jobName);
 
 	}
 

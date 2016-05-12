@@ -37,7 +37,7 @@ public class MyMapReduceDriver {
 	 */
 	public void computeRTOPk(int k, Path pathS, Path pathGridS,
 			Path pathW, Path pathGridW, Path pathOutput, float[] query, int reducersNo,
-			String algorithmForS, String gridForS, String algorithmForRtopk, String jobName)
+			String algorithmForS, String gridForS, String algorithmForRtopk, int gridWSegmentation, String jobName)
 			throws IOException, ClassNotFoundException, InterruptedException {
 		Job job = Job.getInstance();
 
@@ -63,6 +63,7 @@ public class MyMapReduceDriver {
 		job.getConfiguration().set("AlgorithmForS", algorithmForS);
 		job.getConfiguration().set("AlgorithmForRtopk", algorithmForRtopk);
 		job.getConfiguration().set("GridForS", gridForS);
+		job.getConfiguration().setInt("gridWSegmentation", gridWSegmentation);
 		job.addCacheFile( pathGridS.toUri() );
 		job.addCacheFile( pathGridW.toUri() );
 		
