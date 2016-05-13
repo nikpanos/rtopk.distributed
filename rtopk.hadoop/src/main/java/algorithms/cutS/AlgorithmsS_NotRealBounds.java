@@ -12,6 +12,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import algorithms.Functions;
 import model.Cell_W;
+import model.ItemType;
 import model.MyItem;
 import model.MyKey;
 
@@ -49,14 +50,14 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 	}
 	
 	@Override
-	public void sendToReducer(MyItem s) throws IOException, InterruptedException {
+	public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException {
 		Cell_W segment;
 		for (int i=0;i<grid.getSegments().size();i++) {
 			segment = grid.getSegments().get(i);
 			// if is not in dominate area
 			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
 				contextMapper.getCounter(MyCounters.S2).increment(1);
-				contextMapper.write(new MyKey(segment.getId(), s.getItemType()), s);
+				contextMapper.write(new MyKey(segment.getId(), type), s);
 			}
 			else
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);

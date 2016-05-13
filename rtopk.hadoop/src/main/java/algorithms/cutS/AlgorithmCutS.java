@@ -6,6 +6,7 @@ import java.util.Comparator;
 
 import grids.gridsW.GridW;
 import model.Cell_W;
+import model.ItemType;
 import model.MyItem;
 
 public abstract class AlgorithmCutS {
@@ -36,7 +37,7 @@ public abstract class AlgorithmCutS {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	abstract public void sendToReducer(MyItem s) throws IOException, InterruptedException;
+	abstract public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException;
 	
 	/**
 	 * <h1>Set the key of the current Reducer</h1>

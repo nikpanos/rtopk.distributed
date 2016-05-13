@@ -90,7 +90,7 @@ public class Rta {
 		private float score;
 
 		private S_Item_TopK(MyItem item) {
-			super(item.getId(), item.values, item.getItemType());
+			super(item.getId(), item.values);
 		}
 
 	}

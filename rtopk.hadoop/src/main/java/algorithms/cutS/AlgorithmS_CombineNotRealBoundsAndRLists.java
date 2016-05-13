@@ -11,6 +11,7 @@ import algorithms.Functions;
 import grids.gridsW.GridW_FullDimensions;
 import hadoopUtils.counters.MyCounters;
 import model.Cell_W;
+import model.ItemType;
 import model.MyItem;
 import model.MyKey;
 import model.MyListItem;
@@ -61,7 +62,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 	}
 	
 	@Override
-	public void sendToReducer(MyItem s) throws IOException, InterruptedException {
+	public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException {
 		Cell_W segment;
 		for (int i = 0; i < grid.getSegments().size(); i++) {
 			segment = grid.getSegments().get(i);
@@ -69,7 +70,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
 				if(lists[i].add(s)){
 					contextMapper.getCounter(MyCounters.S2).increment(1);
-					contextMapper.write(new MyKey(segment.getId(), s.getItemType()), s);
+					contextMapper.write(new MyKey(segment.getId(), type), s);
 				}
 				else
 					contextMapper.getCounter(MyCounters.S2_pruned_by_RLists).increment(1);

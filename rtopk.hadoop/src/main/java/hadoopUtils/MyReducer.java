@@ -120,31 +120,28 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 
 	public void reduce(MyKey key, Iterable<MyItem> values, Context context) throws IOException, InterruptedException {
 		//RTree tree = new RTree(q.getValues().length);
-		Brs brs = null;
-		Rta rta = null;
-		if (algorithm == RtopkAlgorithm.brs) {
-			brs = new Brs();		
-		}
-		else if (algorithm == RtopkAlgorithm.rta) {
-			rta = new Rta();
-		}
 		
-		algorithmCutS.setReducerKey(key.getKey());
+		//algorithmCutS.setReducerKey(key.getKey());
 		
 		context.setStatus("Working on grid's W cell: " + key.getKey());
 		System.out.println(context.getStatus());
 		
-		long startTime = System.nanoTime();
+		//long startTime = System.nanoTime();
 		
-		for (MyItem mItem : values) {
-			MyItem myItem = new MyItem(mItem.getId(), mItem.getValues().clone(), mItem.getItemType());
-			if (myItem.getItemType() == ItemType.W_InTopK) {
-				//context.getCounter(MyCounters.Reducer_Input_WInTopK).increment(1);
+		MyItem myItem;
+		
+		if (key.getType() == ItemType.W_InTopK) {
+			for (MyItem mItem : values) {
+				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 				context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
 				context.getCounter(MyCounters.RTOPk_Output).increment(1);
+				context.progress();
 			}
-			else if (myItem.getItemType() == ItemType.S) {
-				
+		}
+		else if (key.getType() == ItemType.S) {
+			algorithmCutS.setReducerKey(key.getKey());
+			for (MyItem mItem : values) {
+				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 				//context.getCounter(MyCounters.S2).increment(1);
 				if(algorithmCutS.isInLocalAntidominateArea(myItem)){
 					antidominateAreaCount++;
@@ -158,8 +155,20 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				}
 				//long estimatedTime = System.nanoTime() - startTime;				
 				//context.getCounter(MyCounters.TimeToCreate_RTree).increment(estimatedTime);
+				context.progress();
 			}
-			else if (myItem.getItemType() == ItemType.W) {
+		}
+		else {
+			Brs brs = null;
+			Rta rta = null;
+			if (algorithm == RtopkAlgorithm.brs) {
+				brs = new Brs();		
+			}
+			else if (algorithm == RtopkAlgorithm.rta) {
+				rta = new Rta();
+			}
+			for (MyItem mItem : values) {
+				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 				context.getCounter(MyCounters.W2).increment(1);
 				//brs = new BrsAlgorithm();
 				//long startTime = System.nanoTime();
@@ -178,12 +187,12 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				}
 				//long estimatedTime = System.nanoTime() - startTime;				
 				//context.getCounter(MyCounters.Time_BRS).increment(estimatedTime);
+				context.progress();
 			}
-			context.progress();
 		}
 		
-		long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
-		switch (key.getType()) {
+		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
+		/*switch (key.getType()) {
 		case S:
 			context.getCounter(MyCounters.Total_effort_to_create_rtree_in_seconds).increment(estimatedTime);
 			break;
@@ -193,7 +202,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		case W_InTopK:
 			context.getCounter(MyCounters.Total_effort_for_processing_w_in_rtopk_in_seconds).increment(estimatedTime);
 			break;
-		}
+		}*/
 	}
 	
 	/*

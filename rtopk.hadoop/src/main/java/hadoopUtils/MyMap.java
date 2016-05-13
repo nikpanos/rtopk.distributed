@@ -192,33 +192,33 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		// If the current element belongs to dataset S, then...
 		if (isReadingS) {
 			
-			long startTime = System.nanoTime();
+			//long startTime = System.nanoTime();
 			
-			item.setItemType(ItemType.S);
+			//item.setItemType(ItemType.S);
 			context.getCounter(MyCounters.S).increment(1);			
 			
 			// If the current item dominate or is in tie with q, then...
 			if (Dominance.dominate(item.values, q) >= 0) {
 				context.getCounter(MyCounters.S1).increment(1);
 				
-				algorithmCutS.sendToReducer(item);
+				algorithmCutS.sendToReducer(item, ItemType.S);
 				
 			}
 			else {
 				context.getCounter(MyCounters.S_pruned_by_domination).increment(1);
 			}
 			
-			long estimatedTime = (System.nanoTime() - startTime) / 1000000;
+			//long estimatedTime = (System.nanoTime() - startTime) / 1000000;
 			
-			context.getCounter(MyCounters.Total_effort_for_pruning_S_in_MilliSeconds).increment(estimatedTime);
+			//context.getCounter(MyCounters.Total_effort_for_pruning_S_in_MilliSeconds).increment(estimatedTime);
 
 		}
 		// Else if the current element belongs to dataset W, then...
 		else {
 			
-			long startTime = System.nanoTime();
+			//long startTime = System.nanoTime();
 			
-			item.setItemType(ItemType.W);
+			//item.setItemType(ItemType.W);
 			context.getCounter(MyCounters.W).increment(1);
 			
 			//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
@@ -229,18 +229,18 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			if(k < range[0])
 				context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
 			else if(range[1] < k) {
-				item.setItemType(ItemType.W_InTopK);
-				context.write(new MyKey(reducerNumber, item.getItemType()), item);
+				//item.setItemType(ItemType.W_InTopK);
+				context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
 				context.getCounter(MyCounters.W_in_RTOPk).increment(1);
 			}
 			else {
-				context.write(new MyKey(reducerNumber, item.getItemType()), item);
+				context.write(new MyKey(reducerNumber, ItemType.W), item);
 				context.getCounter(MyCounters.W1).increment(1);
 			}
 			
-			long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
+			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			
-			context.getCounter(MyCounters.Total_effort_for_pruning_W_in_MilliSeconds).increment(estimatedTime);
+			//context.getCounter(MyCounters.Total_effort_for_pruning_W_in_MilliSeconds).increment(estimatedTime);
 		}
 	}
 

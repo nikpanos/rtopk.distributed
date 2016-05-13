@@ -9,6 +9,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import grids.gridsW.GridW_FullDimensions;
 import hadoopUtils.counters.MyCounters;
+import model.ItemType;
 import model.MyItem;
 import model.MyKey;
 import model.MyListItem;
@@ -65,12 +66,12 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 	}
 	
 	@Override
-	public void sendToReducer(MyItem s) throws IOException, InterruptedException {
+	public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException {
 		
 		for (int i = 0; i < lists.length; i++) {
 			
 			if (lists[i].add(s)) {
-				contextMapper.write(new MyKey(lists[i].getSegment().getId(), s.getItemType()), s);
+				contextMapper.write(new MyKey(lists[i].getSegment().getId(), type), s);
 				contextMapper.getCounter(MyCounters.S2).increment(1);
 			} else
 				contextMapper.getCounter(MyCounters.S2_pruned_by_RLists).increment(1);

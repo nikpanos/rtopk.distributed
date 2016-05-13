@@ -76,8 +76,8 @@ public class MyMapReduceDriver {
 		job.setMapOutputValueClass(MyItem.class);
 
 		job.setPartitionerClass(MyPartitioner.class);
-		job.setGroupingComparatorClass(MyGroupComparator.class);
-		job.setSortComparatorClass(MyCompositeKeyComparator.class);
+		job.setGroupingComparatorClass(MyCompositeKeyComparator.class);
+		//job.setSortComparatorClass(MyCompositeKeyComparator.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 

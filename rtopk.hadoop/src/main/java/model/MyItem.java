@@ -12,29 +12,21 @@ public class MyItem implements Writable {
 
 	private long id;
 	public float[] values;
-	private ItemType itemType = ItemType.S;
+	//private ItemType itemType = ItemType.S;
 
 	public MyItem() {
 		super();
 	}
 
-	public MyItem(long id, ItemType itemType) {
+	public MyItem(long id) {
 		super();
 		this.id = id;
-		this.itemType = itemType;
 	}
 
 	public MyItem(long id, float[] values) {
 		super();
 		this.id = id;
 		this.values = values;
-	}
-
-	public MyItem(long id, float[] values, ItemType itemType) {
-		super();
-		this.id = id;
-		this.values = values;
-		this.itemType = itemType;
 	}
 
 	/*
@@ -66,14 +58,6 @@ public class MyItem implements Writable {
 
 	public void setValues(float[] values) {
 		this.values = values;
-	}
-
-	public ItemType getItemType() {
-		return itemType;
-	}
-
-	public void setItemType(ItemType itemType) {
-		this.itemType = itemType;
 	}
 
 	public Text valuesToText() {
@@ -120,7 +104,7 @@ public class MyItem implements Writable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (id ^ (id >>> 32));
-		result = prime * result + ((itemType == null) ? 0 : itemType.hashCode());
+		//result = prime * result + ((itemType == null) ? 0 : itemType.hashCode());
 		result = prime * result + Arrays.hashCode(values);
 		return result;
 	}
@@ -141,8 +125,8 @@ public class MyItem implements Writable {
 		MyItem other = (MyItem) obj;
 		if (id != other.id)
 			return false;
-		if (itemType != other.itemType)
-			return false;
+		//if (itemType != other.itemType)
+		//	return false;
 		if (!Arrays.equals(values, other.values))
 			return false;
 		return true;
@@ -151,14 +135,14 @@ public class MyItem implements Writable {
 	@Override
 	public void readFields(DataInput input) throws IOException {
 		id = input.readLong();
-		int type = input.readByte();
+		/*int type = input.readByte();
 		if (type == 0)
 			itemType = ItemType.W;
 		else if (type == 1)
 			itemType = ItemType.S;
 		else
 			itemType = ItemType.W_InTopK;
-		
+		*/
 		values = new float[input.readByte()];
 		for (int i = 0; i < values.length; i++) {
 			values[i] = input.readFloat();
@@ -168,7 +152,7 @@ public class MyItem implements Writable {
 	@Override
 	public void write(DataOutput output) throws IOException {
 		output.writeLong(id);
-		output.writeByte(itemType.getValue());
+		//output.writeByte(itemType.getValue());
 		output.writeByte(values.length);
 		for (int i = 0; i < values.length; i++) {
 			output.writeFloat(values[i]);
