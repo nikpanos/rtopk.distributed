@@ -62,10 +62,11 @@ public class Main {
 		String gridForS = properties.getProperty("GridForS");
 		String jobName = properties.getProperty("JobName");
 		int gridWSegmentation = Integer.parseInt(properties.getProperty("gridWSegmentation"));
+		boolean combineFiles = Boolean.parseBoolean(properties.getProperty("combineFiles"));
 
 		MyMapReduceDriver driver = new MyMapReduceDriver();
 		driver.computeRTOPk(k, pathS, pathGridS, pathW, pathGridW, pathOutput, query, reducersNo, algorithmForS,
-				gridForS, algorithmForRtopk, gridWSegmentation, jobName);
+				gridForS, algorithmForRtopk, gridWSegmentation, combineFiles, jobName);
 
 	}
 

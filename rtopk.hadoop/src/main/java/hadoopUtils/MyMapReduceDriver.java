@@ -12,7 +12,9 @@ import org.apache.hadoop.mapreduce.CounterGroup;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import hadoopUtils.input.CombineDocumentLineInputFormat;
 import model.MyItem;
 import model.MyKey;
 
@@ -37,7 +39,8 @@ public class MyMapReduceDriver {
 	 */
 	public void computeRTOPk(int k, Path pathS, Path pathGridS,
 			Path pathW, Path pathGridW, Path pathOutput, float[] query, int reducersNo,
-			String algorithmForS, String gridForS, String algorithmForRtopk, int gridWSegmentation, String jobName)
+			String algorithmForS, String gridForS, String algorithmForRtopk,
+			int gridWSegmentation, boolean combineFiles, String jobName)
 			throws IOException, ClassNotFoundException, InterruptedException {
 		Job job = Job.getInstance();
 
@@ -81,23 +84,30 @@ public class MyMapReduceDriver {
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
 
-		job.setMapperClass(MyMap.class);
+		
 		job.setReducerClass(MyReducer.class);
+		
+		if (combineFiles) {
+			// 64 MB, default block size on hadoop, I did that in order to have
+			// locality
+			// http://hadoop.apache.org/docs/r2.6.0/api/org/apache/hadoop/mapred/lib/CombineFileInputFormat.html
+			CombineDocumentLineInputFormat.setMaxInputSplitSize(job, 67108864);
 
-		// 64 MB, default block size on hadoop, I did that in order to have
-		// locality
-		// http://hadoop.apache.org/docs/r2.6.0/api/org/apache/hadoop/mapred/lib/CombineFileInputFormat.html
-		//CombineDocumentLineInputFormat.setMaxInputSplitSize(job, 67108864);
-
-		//job.setInputFormatClass(CombineDocumentLineInputFormat.class);
-		//job.setOutputFormatClass(TextOutputFormat.class);
+			job.setInputFormatClass(CombineDocumentLineInputFormat.class);
+			CombineDocumentLineInputFormat.setInputPaths(job, pathS, pathW);
+			
+			job.setMapperClass(MyCombineMapper.class);
+		}
+		else {
+			FileInputFormat.addInputPath(job, pathS);
+			FileInputFormat.addInputPath(job, pathW);
+			
+			job.setMapperClass(MyMap.class);
+		}
 		
 		job.setNumReduceTasks(reducersNo);
-
-		//CombineDocumentLineInputFormat.setInputPaths(job, pathS, pathW);
-
-		FileInputFormat.addInputPath(job, pathS);
-		FileInputFormat.addInputPath(job, pathW);
+		
+		job.setOutputFormatClass(TextOutputFormat.class);
 		FileOutputFormat.setOutputPath(job, pathOutput);
 
 		@SuppressWarnings("unused")
