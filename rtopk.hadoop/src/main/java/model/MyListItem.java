@@ -90,24 +90,24 @@ public class MyListItem {
 	 */
 	private class K_List_Comparator implements Comparator<MyItem> {
 
-		private Cell_W segment;
+		//private Cell_W segment;
 
 		/**
 		 * @param segment the segment of the grid W
 		 */
 		public K_List_Comparator(Cell_W segment) {
 			super();
-			this.segment = segment;
+			//this.segment = segment;
 		}
 
 		@Override
 		public int compare(MyItem item1, MyItem item2) {			
 			double diff = Functions.calculateScore(segment.getUpperBound(), item1) -
 							Functions.calculateScore(segment.getUpperBound(), item2);
-			if (diff > 0)
-				return 1;
-			else if (diff < 0)
+			if (diff > 0d)
 				return -1;
+			else if (diff < 0d)
+				return 1;
 			return 0;
 		}
 
