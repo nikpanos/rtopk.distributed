@@ -102,6 +102,7 @@ public class MyMapReduceDriver {
 		else {
 			FileInputFormat.addInputPath(job, pathS);
 			FileInputFormat.addInputPath(job, pathW);
+			FileInputFormat.setMaxInputSplitSize(job, 33554432);
 			
 			job.setMapperClass(MyMap.class);
 		}
