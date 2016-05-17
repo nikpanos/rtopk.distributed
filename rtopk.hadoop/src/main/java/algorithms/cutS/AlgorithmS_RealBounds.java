@@ -8,7 +8,6 @@ import java.net.URI;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 
 import algorithms.Functions;
 import model.Cell_W;
@@ -45,7 +44,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 		//contextMapper.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
 	}
 	
-	public AlgorithmS_RealBounds(URI gridWPath, float[] query, Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
+	public AlgorithmS_RealBounds(URI gridWPath, float[] query) throws IOException {
 		super();
 		this.query = query;
 		
@@ -69,7 +68,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 					< Functions.calculateScore(grid.getSegments().get(i).getUpperBound(), query)
 					){
 				
-				contextMapper.getCounter(MyCounters.S2).increment(1);
+				//contextMapper.getCounter(MyCounters.S2).increment(1);
 				contextMapper.write(new MyKey(grid.getSegments().get(i).getId(), type), s);
 			}
 			else

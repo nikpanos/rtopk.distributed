@@ -8,7 +8,6 @@ import java.net.URI;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 
 import algorithms.Functions;
 import model.Cell_W;
@@ -36,7 +35,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 		//contextMapper.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
 	}
 	
-	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query, Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
+	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query) throws IOException {
 		super();
 		this.query = query;
 		
@@ -56,7 +55,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 			segment = grid.getSegments().get(i);
 			// if is not in dominate area
 			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
-				contextMapper.getCounter(MyCounters.S2).increment(1);
+				//contextMapper.getCounter(MyCounters.S2).increment(1);
 				contextMapper.write(new MyKey(segment.getId(), type), s);
 			}
 			else

@@ -67,6 +67,9 @@ public abstract class AlgorithmCutS {
 		float[] fields = w.getFields();
 		for (int i = 0; i < fields.length; i++) {
 			cellDescriptor = (int) (fields[i] / step);
+			if (cellDescriptor == segments) {
+				cellDescriptor--;
+			}
 			tupleCellId += cellDescriptor * Math.pow(segments, i);
 		}
 		

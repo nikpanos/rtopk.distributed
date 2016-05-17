@@ -47,9 +47,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	// setup executed once at the beginning of Reducer
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Reducer.html
 	@Override
-	protected void setup(
-			Reducer<MyKey, MyItem, Text, Text>.Context context)
-			throws IOException, InterruptedException {
+	protected void setup(Reducer<MyKey, MyItem, Text, Text>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
 
 		// initialize k
@@ -85,23 +83,23 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		
 		switch (context.getConfiguration().get("AlgorithmForS")) {
 		case "RealBounds":
-			algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q, context);
+			algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q);
 			break;
 		case "Rlists":
-			algorithmCutS = new AlgorithmS_Rlists(context);
+			algorithmCutS = new AlgorithmS_Rlists();
 			break;
 		case "NotRealBounds":
-			algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q, context);
+			algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q);
 			break;
 		case "CompineNotRealBoundsAndRLists":
-			algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context);
+			algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q);
 			break;
 		default:
 			throw new IllegalArgumentException("Algorithm for S is not correct!!!");
 		};
 
 		context.setStatus("GridW Created!!!");
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
 		
 		String rtopkAlg = context.getConfiguration().get("AlgorithmForRtopk");
 		if (rtopkAlg.equals("BRS")) {
@@ -124,7 +122,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		//algorithmCutS.setReducerKey(key.getKey());
 		
 		context.setStatus("Working on grid's W cell: " + key.getKey());
-		System.out.println(context.getStatus());
+		//System.out.println(context.getStatus());
 		
 		//long startTime = System.nanoTime();
 		
@@ -169,7 +167,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			}
 			for (MyItem mItem : values) {
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
-				context.getCounter(MyCounters.W2).increment(1);
+				//context.getCounter(MyCounters.W2).increment(1);
 				//brs = new BrsAlgorithm();
 				//long startTime = System.nanoTime();
 				if (algorithm == RtopkAlgorithm.brs) {

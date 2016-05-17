@@ -83,7 +83,8 @@ public class MyMapReduceDriver {
 		//job.setSortComparatorClass(MyCompositeKeyComparator.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
-
+		job.setCombinerClass(MyCombiner.class);
+		job.setCombinerKeyGroupingComparatorClass(MyCompositeKeyComparator.class);
 		
 		job.setReducerClass(MyReducer.class);
 		

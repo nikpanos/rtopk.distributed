@@ -125,7 +125,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		
 		if (!isReadingS) {
 			context.setStatus("Create GridS");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 			
 			// create the grid for dataset S
 			//long startTime = System.nanoTime();
@@ -149,7 +149,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 					
 			context.setStatus("GridS Created!!!");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 			
 			int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
 			if (antidominateAreaElementsCount > 0) {
@@ -161,7 +161,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		}
 		//else {
 			context.setStatus("Create GridW");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 			
 			switch (context.getConfiguration().get("AlgorithmForS")) {
 			case "RealBounds":
@@ -182,7 +182,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			
 	
 			context.setStatus("GridW Created!!!");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 		//}
 	}
 

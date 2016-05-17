@@ -5,7 +5,6 @@ import java.net.URI;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 
 import algorithms.Functions;
 import grids.gridsW.GridW_FullDimensions;
@@ -47,8 +46,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 		}
 	}
 	
-	public AlgorithmS_CombineNotRealBoundsAndRLists(URI gridWPath, float[] query,
-			Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
+	public AlgorithmS_CombineNotRealBoundsAndRLists(URI gridWPath, float[] query) throws IOException {
 		super();
 		this.query = query;
 		
@@ -69,7 +67,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 			// if is not in dominate area
 			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
 				if(lists[i].add(s)){
-					contextMapper.getCounter(MyCounters.S2).increment(1);
+					//contextMapper.getCounter(MyCounters.S2).increment(1);
 					contextMapper.write(new MyKey(segment.getId(), type), s);
 				}
 				else
