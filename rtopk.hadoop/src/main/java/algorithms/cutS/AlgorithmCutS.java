@@ -67,12 +67,20 @@ public abstract class AlgorithmCutS {
 		float[] fields = w.getFields();
 		for (int i = 0; i < fields.length; i++) {
 			cellDescriptor = (int) (fields[i] / step);
+			if (cellDescriptor == segments) {
+				cellDescriptor--;
+			}
 			tupleCellId += cellDescriptor * Math.pow(segments, i);
 		}
 		
 		int result = Collections.binarySearch(grid.getSegments(), new Cell_W(0, 0, tupleCellId), comparator);
 		
+		try {
 		return grid.getSegments().get(result).getId();
+		}
+		catch (ArrayIndexOutOfBoundsException ex) {
+			throw new ArrayIndexOutOfBoundsException(ex.getMessage() + " wItem: " + w.valuesToText().toString());
+		}
 	}
 	
 	private static class CellComparator implements Comparator<Cell_W> {
