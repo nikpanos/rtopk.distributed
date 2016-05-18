@@ -104,7 +104,7 @@ public class MyCombiner extends Reducer<MyKey, MyItem, MyKey, MyItem> {
 				}
 				
 				if (algorithmCutS.checkPointUsingList(myItem)) {
-					context.getCounter(MyCounters.S2).increment(1);
+					context.getCounter(MyCounters.S2_by_combiner).increment(1);
 					context.write(key, myItem);
 				}
 				else {

@@ -74,7 +74,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 			
 			if (lists[i].add(s)) {
 				contextMapper.write(new MyKey(lists[i].getSegment().getId(), type), s);
-				contextMapper.getCounter(MyCounters.S2).increment(1);
+				contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 			} else
 				contextMapper.getCounter(MyCounters.S2_pruned_by_RLists).increment(1);
 		}

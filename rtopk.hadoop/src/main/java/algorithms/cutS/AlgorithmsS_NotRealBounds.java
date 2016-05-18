@@ -55,7 +55,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 			segment = grid.getSegments().get(i);
 			// if is not in dominate area
 			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
-				//contextMapper.getCounter(MyCounters.S2).increment(1);
+				contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 				contextMapper.write(new MyKey(segment.getId(), type), s);
 			}
 			else
