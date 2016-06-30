@@ -45,11 +45,11 @@ public class MyMapReduceDriver {
 		Job job = Job.getInstance();
 
 		//job.getConfiguration().set("mapreduce.map.memory.mb", "2560");
-		//job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2147483648");
+		//job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2560m");
 		//mapreduce.map.java.opts
 
-		//job.getConfiguration().set("mapreduce.reduce.memory.mb", "5632");
-		//job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx4224m -Xms512m");
+		//job.getConfiguration().set("mapreduce.reduce.memory.mb", "2560");
+		//job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2560m");
 		//mapreduce.reduce.java.opts
 		
 		long milliSeconds = 1000 * 60 * 60 * 3; //3 hours

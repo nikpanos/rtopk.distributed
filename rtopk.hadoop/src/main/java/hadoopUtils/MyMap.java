@@ -178,7 +178,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 				break;
 			default:
 				throw new IllegalArgumentException("Algorithm for S is not correct!!!");
-			};
+			}
 			
 	
 			context.setStatus("GridW Created!!!");
@@ -221,21 +221,22 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//item.setItemType(ItemType.W);
 			context.getCounter(MyCounters.W).increment(1);
 			
-			//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
-			int reducerNumber = algorithmCutS.getReducerNumber(item, gridWSegmentation);
-			
 			int[] range = gridS.getCount(item, q);
 			
 			if(k < range[0])
 				context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
-			else if(range[1] < k) {
-				//item.setItemType(ItemType.W_InTopK);
-				context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
-				context.getCounter(MyCounters.W_in_RTOPk).increment(1);
-			}
 			else {
-				context.write(new MyKey(reducerNumber, ItemType.W), item);
-				context.getCounter(MyCounters.W1).increment(1);
+				//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
+				int reducerNumber = algorithmCutS.getReducerNumber(item, gridWSegmentation);
+				if(range[1] < k) {
+					//item.setItemType(ItemType.W_InTopK);
+					context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
+					context.getCounter(MyCounters.W_in_RTOPk).increment(1);
+				}
+				else {
+					context.write(new MyKey(reducerNumber, ItemType.W), item);
+					context.getCounter(MyCounters.W1).increment(1);
+				}
 			}
 			
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
