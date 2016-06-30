@@ -2,10 +2,12 @@ package algorithms.cutS;
 
 import hadoopUtils.counters.MyCounters;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
-import java.nio.file.Files;
+import java.util.ArrayList;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -32,6 +34,22 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 	private AngleCell reducerCell;
 	
 	private AngleGrid grid;
+	
+	private String[] readAllLines(URI path) throws IOException {
+		ArrayList<String> result = new ArrayList<>();
+		File gridFile = new File(path.toString());
+		BufferedReader in = new BufferedReader(new FileReader(gridFile));
+		try {
+			String line;
+			while((line = in.readLine()) != null) {
+				result.add(line);
+			}
+			return result.toArray(new String[0]);
+		}
+		finally {
+			in.close();
+		}
+	}
 		
 	public AlgorithmS_RealBounds(URI gridWPath, float[] query, Mapper<Object, Text, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
@@ -39,7 +57,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 		//this.query = query;
 		
 		//long startTime = System.nanoTime();
-		String[] fileLines = Files.readAllLines(new File(gridWPath.toString()).toPath()).toArray(new String[0]);
+		String[] fileLines = readAllLines(gridWPath);
 		grid = new AngleGrid(fileLines, query);
 		
 		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
@@ -53,12 +71,17 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 		
 		//long startTime = System.nanoTime();
 
-		String[] fileLines = Files.readAllLines(new File(gridWPath.toString()).toPath()).toArray(new String[0]);
+		String[] fileLines = readAllLines(gridWPath);
 		grid = new AngleGrid(fileLines, query);
 		
 		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 		
 		//contextReducer.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
+	}
+	
+	@Override
+	public int getReducerNumber(MyItem w, double segments) {
+		return grid.getCellIdByCords(w.values);
 	}
 	
 	@Override
