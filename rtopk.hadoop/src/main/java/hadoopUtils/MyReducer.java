@@ -178,7 +178,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				}
 				else if (algorithm == RtopkAlgorithm.rta) {
 					//datasetW.add(myItem);
-					if (rta.isWeightVectorInRtopk(datasetS, myItem, q, k)) {
+					if (rta.isWeightVectorInRtopk(datasetS, myItem, q, k - antidominateAreaCount)) {
 						context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
 						context.getCounter(MyCounters.RTOPk_Output).increment(1);
 					}
