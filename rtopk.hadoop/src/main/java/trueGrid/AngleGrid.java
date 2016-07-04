@@ -9,11 +9,11 @@ public class AngleGrid {
 	private AngleCell[] cells;
 	private int dimensions;
 	private int segments;
-	private double segmentSize;
-	private static final double semiPI = Math.PI / 2;
+	//private double segmentSize;
+	public static final double semiPI = Math.PI / 2;
 	private double[] q;
 	
-	public AngleGrid(int segments, int dimensions) {
+	/*public AngleGrid(int segments, int dimensions) {
 		int cellCount = (int) Math.pow(segments, dimensions - 1);
 		this.dimensions = dimensions;
 		this.segments = segments;
@@ -28,17 +28,18 @@ public class AngleGrid {
 			//a2 = getCellConclusion(i, Math.PI / 2, segments, dimensions - 1);
 			cells[i] = new AngleCell(i, a1, a2);
 		}
-	}
+	}*/
 	
 	public AngleGrid(int segments, int dimensions, float[] q) {
 		int cellCount = (int) Math.pow(segments, dimensions - 1);
 		this.dimensions = dimensions;
 		this.segments = segments;
-		this.segmentSize = semiPI / (double)segments;
+		//this.segmentSize = semiPI / (double)segments;
 		this.q = convertToDouble(q);
 		
 		cells = new AngleCell[cellCount];
 		double[] a1, a2;
+		//double increment = 0.0001d;
 		for (int i = 0; i < cellCount; i++) {
 			a1 = round(getCellOrigin(i, semiPI, segments, dimensions - 1), 2);
 			a2 = round(getCellConclusion(i, semiPI, segments, dimensions - 1), 2);
@@ -53,7 +54,7 @@ public class AngleGrid {
 		int cellCount = Integer.parseInt(headers[0]);
 		this.dimensions = Integer.parseInt(headers[1]);
 		this.segments = Integer.parseInt(headers[2]);
-		this.segmentSize = semiPI / (double)segments;
+		//this.segmentSize = semiPI / (double)segments;
 		this.q = convertToDouble(q);
 		
 		cells = new AngleCell[cellCount];
@@ -149,18 +150,24 @@ public class AngleGrid {
 	}
 	
 	public int getCellIdByAngles(double[] angles) {
-		int result = 0;
+		for (int i = 0; i < cells.length; i++) {
+			if (cells[i].containsWByAngles(angles)) {
+				return i;
+			}
+		}
+		return -1;
+		/*int result = 0;
 		int cellDescriptor;
 		for (int i = 0; i < angles.length; i++) {
 			if (angles[i] == semiPI) {
 				cellDescriptor = segments - 1;
 			}
 			else {
-				cellDescriptor = (int) (angles[i] / segmentSize);
+				cellDescriptor = (int) Math.floor(angles[i] / segmentSize);
 			}
 			result += cellDescriptor * Math.pow(segments, i);
 		}
-		return result;
+		return result;*/
 	}
 
 	public AngleCell[] getCells() {

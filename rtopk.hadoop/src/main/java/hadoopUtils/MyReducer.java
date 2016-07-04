@@ -49,7 +49,9 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	@Override
 	protected void setup(Reducer<MyKey, MyItem, Text, Text>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
-
+		
+		//int gridWSegmentation = context.getConfiguration().getInt("gridWSegmentation", 10);
+		
 		// initialize k
 		k = context.getConfiguration().getInt("K", 0);
 		if (k <= 0)

@@ -79,7 +79,6 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 		//contextReducer.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
 	}
 	
-	@Override
 	public int getReducerNumber(MyItem w, double segments) {
 		return grid.getCellIdByCords(w.values);
 	}
@@ -93,6 +92,10 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 			if (cell.qIsBetterRankedThanP(s.values)) {
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
 			}
+			/*else if (cell.pIsBetterRankedThanQ(s.values)) {
+				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
+				contextMapper.write(new MyKey(i, type), s);
+			}*/
 			else {
 				contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 				contextMapper.write(new MyKey(i, type), s);
@@ -109,9 +112,13 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 	@Override
 	public boolean isInLocalAntidominateArea(MyItem s) {
 		// if is under both LowerBound and UpperBound, then is in antidominate area.
-		return reducerCell.pIsBetterRankedThanQ(s.values);
+		return false;
+		//return isInLocalAntidominateArea(s, reducerCell);
 	}
 	
-	
+	private boolean isInLocalAntidominateArea(MyItem s, AngleCell reducerCell) {
+		// if is under both LowerBound and UpperBound, then is in antidominate area.
+		return reducerCell.pIsBetterRankedThanQ(s.values);
+	}
 
 }

@@ -106,9 +106,9 @@ public class AngleCell {
 
 	public boolean containsWByAngles(double[] a) {
 		for (int i = 0; i < a.length; i++) {
-			if ((a[i] == Math.PI / 2) && ((angle1[i] == a[i]) || (angle2[i] == a[i]))) {
+			/*if ((a[i] == AngleGrid.semiPI) && ((angle1[i] == a[i]) || (angle2[i] == a[i]))) {
 				continue;
-			}
+			}*/
 			if (!isInRange(a[i], angle1[i], angle2[i])) {
 				return false;
 			}
@@ -117,7 +117,7 @@ public class AngleCell {
 	}
 
 	private boolean isInRange(double x, double a, double b) {
-		return (a < b) ? ((a <= x) && (b > x)) : ((b <= x) && (a > x));
+		return (a < b) ? ((a <= x) && (b >= x)) : ((b <= x) && (a >= x));
 	}
 
 	public String toString() {

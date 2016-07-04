@@ -23,7 +23,8 @@ public enum MyCounters {
 	RTOPk_Output,
 	S_Elements_In_Antidominance_Area_Of_GridS,
 	Reducers_Early_Terminated,
-	Combiners_Early_Terminated
+	Combiners_Early_Terminated,
+	S_in_antidominate_area
 	//Total_effort_to_create_rtree_in_seconds,
 	//Total_effort_for_rtopk_algorithm_in_seconds,
 	//Total_effort_for_processing_w_in_rtopk_in_seconds,
