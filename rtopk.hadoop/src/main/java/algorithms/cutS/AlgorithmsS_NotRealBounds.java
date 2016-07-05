@@ -65,7 +65,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 
 	@Override
 	public void setReducerKey(int key) {
-		for(Cell_W cell : getGridW().getSegments()){
+		for(Cell_W cell : grid.getSegments()){
 			if(cell.getId()==key) {
 				reducerCell = cell;
 				break;

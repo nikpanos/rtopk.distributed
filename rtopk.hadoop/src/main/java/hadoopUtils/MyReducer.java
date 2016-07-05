@@ -50,30 +50,19 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	protected void setup(Reducer<MyKey, MyItem, Text, Text>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
 		
-		//int gridWSegmentation = context.getConfiguration().getInt("gridWSegmentation", 10);
+		int gridWSegmentation = context.getConfiguration().getInt("gridWSegmentation", 10);
 		
 		// initialize k
 		k = context.getConfiguration().getInt("K", 0);
-		if (k <= 0)
-			throw new IllegalArgumentException("K is not set!!!");
 
 		// Initialize the dimensions number of the query
-		int queryDimentions = context.getConfiguration().getInt(
-				"queryDimentions", 0);
-
-		if (queryDimentions < 1)
-			throw new IllegalArgumentException("Query Dimentions is not set!!!");
+		int queryDimentions = context.getConfiguration().getInt("queryDimentions", 0);
 		
 		q = new float[queryDimentions];
 		
 		// add values to the array
 		for (int i = 0; i < queryDimentions; i++) {
-			float value = context.getConfiguration().getFloat("queryDim" + i,
-					-1);
-			if (value < 0)
-				throw new IllegalArgumentException("Dimention " + i
-						+ " is not set!!!");
-			q[i] = value;
+			q[i] = context.getConfiguration().getFloat("queryDim" + i, 0);
 		}
 		
 		URI gridWPath = context.getCacheFiles()[1];
@@ -85,7 +74,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		
 		switch (context.getConfiguration().get("AlgorithmForS")) {
 		case "RealBounds":
-			algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q);
+			algorithmCutS = new AlgorithmS_RealBounds(gridWSegmentation, q);
 			break;
 		case "Rlists":
 			algorithmCutS = new AlgorithmS_Rlists();
@@ -123,7 +112,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		
 		//algorithmCutS.setReducerKey(key.getKey());
 		
-		context.setStatus("Working on grid's W cell: " + key.getKey());
+		//context.setStatus("Working on grid's W cell: " + key.getKey());
 		//System.out.println(context.getStatus());
 		
 		//long startTime = System.nanoTime();
@@ -142,9 +131,9 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			algorithmCutS.setReducerKey(key.getKey());
 			for (MyItem mItem : values) {
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
-				//context.getCounter(MyCounters.S2).increment(1);
 				if(algorithmCutS.isInLocalAntidominateArea(myItem)){
 					antidominateAreaCount++;
+					continue;
 				}
 				
 				if (algorithm == RtopkAlgorithm.brs) {
@@ -153,8 +142,6 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				else if (algorithm == RtopkAlgorithm.rta) {
 					datasetS.add(myItem);
 				}
-				//long estimatedTime = System.nanoTime() - startTime;				
-				//context.getCounter(MyCounters.TimeToCreate_RTree).increment(estimatedTime);
 				context.progress();
 			}
 		}
@@ -180,7 +167,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				}
 				else if (algorithm == RtopkAlgorithm.rta) {
 					//datasetW.add(myItem);
-					if (rta.isWeightVectorInRtopk(datasetS, myItem, q, k, context)) {
+					if (rta.isWeightVectorInRtopk(datasetS, myItem, q, k - antidominateAreaCount)) {
 						context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
 						context.getCounter(MyCounters.RTOPk_Output).increment(1);
 					}

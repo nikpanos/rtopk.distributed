@@ -65,7 +65,7 @@ public class AngleCell {
 		double scoreP;
 		for (int i = 0; i < w.length; i++) {
 			scoreP = calculateScore(p, w[i]);
-			if (scoreP <= scoresQ[i]) {
+			if (scoreP < scoresQ[i]) {
 				return false;
 			}
 		}

@@ -2,18 +2,16 @@ package trueGrid;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 
 public class AngleGrid {
 	private AngleCell[] cells;
 	private int dimensions;
 	private int segments;
-	//private double segmentSize;
+	private double segmentSize;
 	public static final double semiPI = Math.PI / 2;
 	private double[] q;
 	
-	/*public AngleGrid(int segments, int dimensions) {
+	public AngleGrid(int segments, int dimensions) {
 		int cellCount = (int) Math.pow(segments, dimensions - 1);
 		this.dimensions = dimensions;
 		this.segments = segments;
@@ -22,27 +20,27 @@ public class AngleGrid {
 		cells = new AngleCell[cellCount];
 		double[] a1, a2;
 		for (int i = 0; i < cellCount; i++) {
-			a1 = round(getCellOrigin(i, semiPI, segments, dimensions - 1), 2);
-			a2 = round(getCellConclusion(i, semiPI, segments, dimensions - 1), 2);
+			a1 = getCellOrigin(i, semiPI, segments, dimensions - 1);
+			a2 = getCellConclusion(i, semiPI, segments, dimensions - 1);
 			//a1 = getCellOrigin(i, Math.PI / 2, segments, dimensions - 1);
 			//a2 = getCellConclusion(i, Math.PI / 2, segments, dimensions - 1);
 			cells[i] = new AngleCell(i, a1, a2);
 		}
-	}*/
+	}
 	
-	public AngleGrid(int segments, int dimensions, float[] q) {
-		int cellCount = (int) Math.pow(segments, dimensions - 1);
-		this.dimensions = dimensions;
+	public AngleGrid(int segments, float[] q) {
+		int cellCount = (int) Math.pow(segments, q.length - 1);
+		this.dimensions = q.length;
 		this.segments = segments;
-		//this.segmentSize = semiPI / (double)segments;
+		this.segmentSize = semiPI / (double)segments;
 		this.q = convertToDouble(q);
 		
 		cells = new AngleCell[cellCount];
 		double[] a1, a2;
 		//double increment = 0.0001d;
 		for (int i = 0; i < cellCount; i++) {
-			a1 = round(getCellOrigin(i, semiPI, segments, dimensions - 1), 2);
-			a2 = round(getCellConclusion(i, semiPI, segments, dimensions - 1), 2);
+			a1 = getCellOrigin(i, semiPI, segments, dimensions - 1);
+			a2 = getCellConclusion(i, semiPI, segments, dimensions - 1);
 			//a1 = getCellOrigin(i, Math.PI / 2, segments, dimensions - 1);
 			//a2 = getCellConclusion(i, Math.PI / 2, segments, dimensions - 1);
 			cells[i] = new AngleCell(i, a1, a2, this.q);
@@ -54,7 +52,7 @@ public class AngleGrid {
 		int cellCount = Integer.parseInt(headers[0]);
 		this.dimensions = Integer.parseInt(headers[1]);
 		this.segments = Integer.parseInt(headers[2]);
-		//this.segmentSize = semiPI / (double)segments;
+		this.segmentSize = semiPI / (double)segments;
 		this.q = convertToDouble(q);
 		
 		cells = new AngleCell[cellCount];
@@ -121,7 +119,7 @@ public class AngleGrid {
 		return result;
 	}
 	*/
-	public static double[] round(double value[], int places) {
+	/*public static double[] round(double value[], int places) {
 	    if (places < 0) throw new IllegalArgumentException();
 	    double[] result = new double[value.length];
 	    for (int i = 0; i < result.length; i++) {
@@ -134,7 +132,7 @@ public class AngleGrid {
 		    result[i] = bd.doubleValue();
 	    }
 	    return result;
-	}
+	}*/
 	
 	public static double[] convertToDouble(float[] x) {
 		double[] result = new double[x.length];
@@ -150,13 +148,13 @@ public class AngleGrid {
 	}
 	
 	public int getCellIdByAngles(double[] angles) {
-		for (int i = 0; i < cells.length; i++) {
+		/*for (int i = 0; i < cells.length; i++) {
 			if (cells[i].containsWByAngles(angles)) {
 				return i;
 			}
 		}
-		return -1;
-		/*int result = 0;
+		return -1;*/
+		int result = 0;
 		int cellDescriptor;
 		for (int i = 0; i < angles.length; i++) {
 			if (angles[i] == semiPI) {
@@ -167,7 +165,7 @@ public class AngleGrid {
 			}
 			result += cellDescriptor * Math.pow(segments, i);
 		}
-		return result;*/
+		return result;
 	}
 
 	public AngleCell[] getCells() {

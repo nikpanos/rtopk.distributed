@@ -38,7 +38,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	// The name of the file that contains the dataset S
 	private static String fileName_S;
 	// The name of the file that contains the dataset W
-	private static String fileName_W;
+	//private static String fileName_W;
 
 	// The grid of dataset S
 	private static GridS gridS;
@@ -62,56 +62,27 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		
 		// initialize �
 		k = context.getConfiguration().getInt("K", 0);
-		if (k <= 0)
-			throw new IllegalArgumentException("K is not set!!!");
 
 		// initialize the filename of the file that contains dataset S
 		fileName_S = context.getConfiguration().get("FileName_S");
 
-		if (fileName_S == null || fileName_S.trim().equals(""))
-			throw new IllegalArgumentException("FileName S is not set!!!");
-
 		// initialize the filename of the file that contains dataset W
-		fileName_W = context.getConfiguration().get("FileName_W");
-
-		if (fileName_W == null || fileName_W.trim().equals(""))
-			throw new IllegalArgumentException("FileName W is not set!!!");
+		//fileName_W = context.getConfiguration().get("FileName_W");
 		
 		String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
 		
-		if (filename.equals(fileName_S)) {
-			isReadingS = true;
-		}
-		else if (filename.equals(fileName_W)) {
-			isReadingS = false;
-		}
-		else {
-			// Throw exception that the filenames are wrong
-			throw new IllegalArgumentException("Wrong Filenames!!!");
-		}
+		isReadingS = filename.equals(fileName_S);
 
 		// Initialize the dimensions number of the query
-		int queryDimentions = context.getConfiguration().getInt(
-				"queryDimentions", 0);
-
-		if (queryDimentions < 1)
-			throw new IllegalArgumentException("Query Dimentions is not set!!!");
+		int queryDimentions = context.getConfiguration().getInt("queryDimentions", 0);
 
 		// Initialize the array that contains the value of each dimension of the query
 		q = new float[queryDimentions];
 
 		// add values to the array
 		for (int i = 0; i < queryDimentions; i++) {
-			float value = context.getConfiguration().getFloat("queryDim" + i,
-					-1);
-			if (value < 0)
-				throw new IllegalArgumentException("Dimention " + i
-						+ " is not set!!!");
-			q[i] = value;
+			q[i] = context.getConfiguration().getFloat("queryDim" + i, -1);
 		}
-				
-		if(context.getCacheFiles().length!=2)
-			throw new IllegalArgumentException("Files that contains the Grid for S and W is not set!!!");
 		
 		URI gridSPath = context.getCacheFiles()[0];
 		URI gridWPath = context.getCacheFiles()[1];
@@ -165,7 +136,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			
 			switch (context.getConfiguration().get("AlgorithmForS")) {
 			case "RealBounds":
-				algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q, context);
+				algorithmCutS = new AlgorithmS_RealBounds(gridWSegmentation, q, context);
 				break;
 			case "Rlists":
 				algorithmCutS = new AlgorithmS_Rlists(k,gridWPath,context);

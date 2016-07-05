@@ -35,6 +35,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 	
 	private AngleGrid grid;
 	
+	@SuppressWarnings("unused")
 	private String[] readAllLines(URI path) throws IOException {
 		ArrayList<String> result = new ArrayList<>();
 		File gridFile = new File(path.toString());
@@ -51,28 +52,30 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 		}
 	}
 		
-	public AlgorithmS_RealBounds(URI gridWPath, float[] query, Mapper<Object, Text, MyKey, MyItem>.Context contextMapper) throws IOException {
+	public AlgorithmS_RealBounds(int gridSegmentation, float[] query, Mapper<Object, Text, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
 		this.contextMapper = contextMapper;
 		//this.query = query;
 		
 		//long startTime = System.nanoTime();
-		String[] fileLines = readAllLines(gridWPath);
-		grid = new AngleGrid(fileLines, query);
+		//String[] fileLines = readAllLines(gridWPath);
+		//grid = new AngleGrid(fileLines, query);
+		grid = new AngleGrid(gridSegmentation, query);
 		
 		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 		
 		//contextMapper.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
 	}
 	
-	public AlgorithmS_RealBounds(URI gridWPath, float[] query) throws IOException {
+	public AlgorithmS_RealBounds(int gridSegmentation, float[] query) throws IOException {
 		super();
 		//this.query = query;
 		
 		//long startTime = System.nanoTime();
 
-		String[] fileLines = readAllLines(gridWPath);
-		grid = new AngleGrid(fileLines, query);
+		//String[] fileLines = readAllLines(gridWPath);
+		//grid = new AngleGrid(fileLines, query);
+		grid = new AngleGrid(gridSegmentation, query);
 		
 		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 		
@@ -112,8 +115,8 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 	@Override
 	public boolean isInLocalAntidominateArea(MyItem s) {
 		// if is under both LowerBound and UpperBound, then is in antidominate area.
-		return false;
-		//return isInLocalAntidominateArea(s, reducerCell);
+		//return false;
+		return isInLocalAntidominateArea(s, reducerCell);
 	}
 	
 	private boolean isInLocalAntidominateArea(MyItem s, AngleCell reducerCell) {
