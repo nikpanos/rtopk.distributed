@@ -110,8 +110,8 @@ public class MyMapReduceDriver {
 			job.setMapperClass(MyMap.class);
 		}
 		
-		//job.setNumReduceTasks(reducersNo);
-		job.setNumReduceTasks(1);
+		job.setNumReduceTasks(reducersNo);
+		//job.setNumReduceTasks(1);
 		
 		job.setOutputFormatClass(TextOutputFormat.class);
 		FileOutputFormat.setOutputPath(job, pathOutput);
