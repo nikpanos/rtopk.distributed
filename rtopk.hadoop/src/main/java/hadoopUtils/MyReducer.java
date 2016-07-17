@@ -10,14 +10,17 @@ import java.util.ArrayList;
 import model.ItemType;
 import model.MyItem;
 import model.MyKey;
-import model.RTree;
 import model.RtopkAlgorithm;
 
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import algorithms.Brs;
+import com.github.davidmoten.rtree.RTree;
+import com.github.davidmoten.rtree.geometry.Geometries;
+import com.github.davidmoten.rtree.geometry.Point;
+
+import algorithms.BrsWithNewTree;
 import algorithms.Rta;
 import algorithms.cutS.AlgorithmCutS;
 import algorithms.cutS.AlgorithmS_CombineNotRealBoundsAndRLists;
@@ -37,7 +40,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	
 	private int antidominateAreaCount = 0;
 	
-	private RTree tree;
+	private RTree<Object, Point> tree;
 	
 	private ArrayList<MyItem> datasetS;
 	//private ArrayList<MyItem> datasetW;
@@ -92,10 +95,10 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		context.setStatus("GridW Created!!!");
 		//System.out.println(context.getStatus());
 		
-		String rtopkAlg = context.getConfiguration().get("AlgorithmForRtopk");
+		String rtopkAlg = "BRS";//context.getConfiguration().get("AlgorithmForRtopk");
 		if (rtopkAlg.equals("BRS")) {
 			algorithm = RtopkAlgorithm.brs;
-			tree = new RTree(q.length);
+			tree = RTree.star().maxChildren(5).create();
 		}
 		else if (rtopkAlg.equals("RTA")) {
 			algorithm = RtopkAlgorithm.rta;
@@ -137,7 +140,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				}
 				
 				if (algorithm == RtopkAlgorithm.brs) {
-					tree.insert(myItem);
+					tree = tree.add(null, Geometries.point(myItem.values));
 				}
 				else if (algorithm == RtopkAlgorithm.rta) {
 					datasetS.add(myItem);
@@ -146,10 +149,10 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			}
 		}
 		else {
-			Brs brs = null;
+			BrsWithNewTree brs = null;
 			Rta rta = null;
 			if (algorithm == RtopkAlgorithm.brs) {
-				brs = new Brs();		
+				brs = new BrsWithNewTree(k - antidominateAreaCount);		
 			}
 			else if (algorithm == RtopkAlgorithm.rta) {
 				rta = new Rta();
@@ -160,7 +163,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				//brs = new BrsAlgorithm();
 				//long startTime = System.nanoTime();
 				if (algorithm == RtopkAlgorithm.brs) {
-					if (brs.isWeightVectorInRtopk(q, tree, myItem, k)) {
+					if (brs.isWeightVectorInRtopk(q, tree, myItem)) {
 						context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
 						context.getCounter(MyCounters.RTOPk_Output).increment(1);
 					}
