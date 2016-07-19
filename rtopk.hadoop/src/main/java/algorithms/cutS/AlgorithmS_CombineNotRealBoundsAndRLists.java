@@ -64,12 +64,14 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 		Cell_W segment;
 		for (int i = 0; i < grid.getSegments().size(); i++) {
 			segment = grid.getSegments().get(i);
-			// if is not in dominate area
-			if (isInLocalAntidominateArea(s, segment)) {
+			if(Functions.calculateScore(segment.getLowerBound(), s) > Functions.calculateScore(segment.getUpperBound(), query)) {
+				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
+			}
+			else if (isInLocalAntidominateArea(s, segment)) {
 				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
 				contextMapper.write(new MyKey(segment.getId(), ItemType.S_antidom), s);
 			}
-			else if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
+			else {
 				if(lists[i].add(s)){
 					contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 					contextMapper.write(new MyKey(segment.getId(), type), s);
@@ -77,8 +79,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 				else
 					contextMapper.getCounter(MyCounters.S2_pruned_by_RLists).increment(1);
 			}
-			else
-				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
+				
 		}		
 	}
 
