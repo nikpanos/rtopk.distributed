@@ -136,7 +136,12 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 				if(algorithmCutS.isInLocalAntidominateArea(myItem)){
 					antidominateAreaCount++;
-					continue;
+					if (antidominateAreaCount >= k) {
+						break;
+					}
+					else {
+						continue;
+					}
 				}
 				
 				if (algorithm == RtopkAlgorithm.brs) {
