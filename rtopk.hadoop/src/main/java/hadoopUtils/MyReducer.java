@@ -3,8 +3,6 @@ package hadoopUtils;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import model.ItemType;
@@ -12,7 +10,6 @@ import model.MyItem;
 import model.MyKey;
 import model.RtopkAlgorithm;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
@@ -22,11 +19,6 @@ import com.github.davidmoten.rtree.geometry.Point;
 
 import algorithms.BrsWithNewTree;
 import algorithms.Rta;
-import algorithms.cutS.AlgorithmCutS;
-import algorithms.cutS.AlgorithmS_CombineNotRealBoundsAndRLists;
-import algorithms.cutS.AlgorithmS_RealBounds;
-import algorithms.cutS.AlgorithmS_Rlists;
-import algorithms.cutS.AlgorithmsS_NotRealBounds;
 
 public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 
@@ -36,7 +28,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	private static int k;
 
 	// The grid of dataset W
-	private static AlgorithmCutS algorithmCutS;
+	//private static AlgorithmCutS algorithmCutS;
 	
 	private int antidominateAreaCount = 0;
 	
@@ -53,7 +45,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	protected void setup(Reducer<MyKey, MyItem, Text, Text>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
 		
-		int gridWSegmentation = context.getConfiguration().getInt("gridWSegmentation", 10);
+		//int gridWSegmentation = context.getConfiguration().getInt("gridWSegmentation", 10);
 		
 		// initialize k
 		k = context.getConfiguration().getInt("K", 0);
@@ -68,14 +60,14 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			q[i] = context.getConfiguration().getFloat("queryDim" + i, 0);
 		}
 		
-		URI gridWPath = context.getCacheFiles()[1];
-		try {
-			gridWPath = new URI(new Path(gridWPath.getPath()).getName());
-		} catch (IllegalArgumentException | URISyntaxException e) {
-			e.printStackTrace();
-		}
+		//URI gridWPath = context.getCacheFiles()[1];
+		//try {
+		//	gridWPath = new URI(new Path(gridWPath.getPath()).getName());
+		//} catch (IllegalArgumentException | URISyntaxException e) {
+		//	e.printStackTrace();
+		//}
 		
-		switch (context.getConfiguration().get("AlgorithmForS")) {
+		/*switch (context.getConfiguration().get("AlgorithmForS")) {
 		case "RealBounds":
 			algorithmCutS = new AlgorithmS_RealBounds(gridWSegmentation, q);
 			break;
@@ -92,7 +84,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			throw new IllegalArgumentException("Algorithm for S is not correct!!!");
 		};
 
-		context.setStatus("GridW Created!!!");
+		context.setStatus("GridW Created!!!");*/
 		//System.out.println(context.getStatus());
 		
 		String rtopkAlg = "BRS";//context.getConfiguration().get("AlgorithmForRtopk");
@@ -130,11 +122,19 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				context.progress();
 			}
 		}
+		else if (key.getType() == ItemType.S_antidom) {
+			for (@SuppressWarnings("unused") MyItem mItem : values) {
+				antidominateAreaCount++;
+				if (antidominateAreaCount >= k) {
+					break;
+				}
+			}
+		}
 		else if (key.getType() == ItemType.S) {
-			algorithmCutS.setReducerKey(key.getKey());
+			//algorithmCutS.setReducerKey(key.getKey());
 			for (MyItem mItem : values) {
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
-				if(algorithmCutS.isInLocalAntidominateArea(myItem)){
+				/*if(algorithmCutS.isInLocalAntidominateArea(myItem)){
 					antidominateAreaCount++;
 					if (antidominateAreaCount >= k) {
 						break;
@@ -142,7 +142,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 					else {
 						continue;
 					}
-				}
+				}*/
 				
 				if (algorithm == RtopkAlgorithm.brs) {
 					tree = tree.add(null, Geometries.point(myItem.values));

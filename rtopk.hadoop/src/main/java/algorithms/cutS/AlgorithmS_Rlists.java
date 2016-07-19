@@ -22,11 +22,11 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 	 */
 	private MyListItem[] lists;
 	
-	private Cell_W reducerCell;
+	//private Cell_W reducerCell;
 	
 	private float[] query;
 	
-	private int k;
+	//private int k;
 	
 	/**
 	 * The Mapper's context 
@@ -66,7 +66,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 		lists = new MyListItem[1];
 		//lists[0] = new MyListItem(grid.getSegments().get(partitionId), k);
 		this.query = query;
-		this.k = k;
+		//this.k = k;
 	}
 	
 	/**
@@ -102,7 +102,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 	 * <h1>Set the key of the current Reducer</h1>
 	 * This algorithm has no functionality at reduce phase. This method do nothing.
 	 */
-	@Override
+	/*@Override
 	public void setReducerKey(int key){
 		for(Cell_W cell : getGridW().getSegments()){
 			if(cell.getId()==key) {
@@ -112,14 +112,14 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 		}
 		
 		lists[0] = new MyListItem(reducerCell, k);
-	}
+	}*/
 	
 	/**
 	 * <h1>Check if element S belongs to local antidominate area</h1>
 	 * This algorithm has no functionality at reduce phase. This method return always false.
 	 */
 	@Override
-	public boolean isInLocalAntidominateArea(MyItem s) {
+	public boolean isInLocalAntidominateArea(MyItem s, Cell_W reducerCell) {
 		if (Functions.calculateScore(reducerCell.getUpperBound(),s) 
 				< Functions.calculateScore(reducerCell.getLowerBound(), query)) {
 			return true;

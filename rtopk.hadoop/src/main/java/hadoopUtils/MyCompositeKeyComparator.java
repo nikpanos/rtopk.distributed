@@ -24,7 +24,7 @@ public class MyCompositeKeyComparator extends WritableComparator {
         //int j2 = readInt(b2, s2+4);
         // = (j1 < j2) ? -1 : (j1 == j2) ? 0 : 1;
          
-        return b2[s2 + 4] - b1[s1 + 4];
+        return b1[s1 + 4] - b2[s2 + 4];
     }
     /*
     @SuppressWarnings("rawtypes")

@@ -51,11 +51,13 @@ public class MyKey implements WritableComparable {
 		key = input.readInt();
 		int type = input.readByte();
 		if (type == 0)
-			this.type = ItemType.W;
+			this.type = ItemType.W_InTopK;
 		else if(type == 1)
+			this.type = ItemType.S_antidom;
+		else if (type == 2)
 			this.type = ItemType.S;
 		else
-			this.type = ItemType.W_InTopK;
+			this.type = ItemType.W;
 	}
 
 	@Override
@@ -71,7 +73,7 @@ public class MyKey implements WritableComparable {
 		int tmp = other.key - this.key;
 		
 		if (tmp == 0) {
-			return -(this.type.getValue() - other.type.getValue());
+			return this.type.getValue() - other.type.getValue();
 		}
 		
 		return tmp;

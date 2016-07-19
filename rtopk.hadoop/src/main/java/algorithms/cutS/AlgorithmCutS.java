@@ -45,7 +45,7 @@ public abstract class AlgorithmCutS {
 	 * grid W the Reducer belongs.
 	 * @param key the Reducer key value
 	 */
-	abstract public void setReducerKey(int key);
+	//abstract public void setReducerKey(int key);
 	
 	/**
 	 * <h1>Check if element S belongs to local antidominate area</h1>
@@ -57,7 +57,7 @@ public abstract class AlgorithmCutS {
 	 * @param s an element of dataset S
 	 * @return true or false if element s belongs to local antidominate area or not
 	 */
-	abstract public boolean isInLocalAntidominateArea(MyItem s);
+	abstract public boolean isInLocalAntidominateArea(MyItem s, Cell_W reducerCell);
 	
 	public int getReducerNumber(MyItem w, double segments) {
 		int cellDescriptor;

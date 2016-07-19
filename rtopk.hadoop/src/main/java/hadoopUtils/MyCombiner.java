@@ -1,21 +1,14 @@
 package hadoopUtils;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.mapreduce.Reducer;
 
-import algorithms.cutS.AlgorithmS_Rlists;
-import hadoopUtils.counters.MyCounters;
-import model.ItemType;
 import model.MyItem;
 import model.MyKey;
 
 public class MyCombiner extends Reducer<MyKey, MyItem, MyKey, MyItem> {
 	
-	// The query
+	/*// The query
 	private static float[] q;
 	// The K of RTOPk
 	private static int k;
@@ -123,5 +116,5 @@ public class MyCombiner extends Reducer<MyKey, MyItem, MyKey, MyItem> {
 				context.progress();
 			}
 		}
-	}
+	}*/
 }

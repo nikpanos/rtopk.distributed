@@ -19,7 +19,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 
 	private Mapper<Object, Text, MyKey, MyItem>.Context contextMapper;
 	private float[] query;
-	private Cell_W reducerCell;
+	//private Cell_W reducerCell;
 		
 	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query, Mapper<Object, Text, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
@@ -53,8 +53,11 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 		Cell_W segment;
 		for (int i=0;i<grid.getSegments().size();i++) {
 			segment = grid.getSegments().get(i);
-			// if is not in dominate area
-			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
+			if (isInLocalAntidominateArea(s, segment)) {
+				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
+				contextMapper.write(new MyKey(segment.getId(), ItemType.S_antidom), s);
+			}
+			else if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
 				contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 				contextMapper.write(new MyKey(segment.getId(), type), s);
 			}
@@ -63,7 +66,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 		}		
 	}
 
-	@Override
+	/*@Override
 	public void setReducerKey(int key) {
 		for(Cell_W cell : grid.getSegments()){
 			if(cell.getId()==key) {
@@ -71,10 +74,10 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 				break;
 			}
 		}
-	}
+	}*/
 
 	@Override
-	public boolean isInLocalAntidominateArea(MyItem s) {
+	public boolean isInLocalAntidominateArea(MyItem s, Cell_W reducerCell) {
 		// if is in antidominate area
 		if (Functions.calculateScore(reducerCell.getUpperBound(),s) 
 				< Functions.calculateScore(reducerCell.getLowerBound(), query)) {

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
+import model.Cell_W;
 import model.ItemType;
 import model.MyItem;
 import model.MyKey;
@@ -31,7 +32,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 	/**
 	 * The current reducer cell
 	 */
-	private AngleCell reducerCell;
+	//private AngleCell reducerCell;
 	
 	private AngleGrid grid;
 	
@@ -95,10 +96,10 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 			if (cell.qIsBetterRankedThanP(s.values)) {
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
 			}
-			/*else if (cell.pIsBetterRankedThanQ(s.values)) {
+			else if (cell.pIsBetterRankedThanQ(s.values)) {
 				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
-				contextMapper.write(new MyKey(i, type), s);
-			}*/
+				contextMapper.write(new MyKey(i, ItemType.S_antidom), s);
+			}
 			else {
 				contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 				contextMapper.write(new MyKey(i, type), s);
@@ -107,21 +108,19 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 		
 	}
 
-	@Override
+	/*@Override
 	public void setReducerKey(int key) {
 		reducerCell = grid.getCells()[key];
-	}
+	}*/
 
 	@Override
-	public boolean isInLocalAntidominateArea(MyItem s) {
-		// if is under both LowerBound and UpperBound, then is in antidominate area.
-		//return false;
-		return isInLocalAntidominateArea(s, reducerCell);
+	public boolean isInLocalAntidominateArea(MyItem s, Cell_W reducerCell) {
+		return false;
 	}
 	
-	private boolean isInLocalAntidominateArea(MyItem s, AngleCell reducerCell) {
+	/*private boolean isInLocalAntidominateArea(MyItem s, AngleCell reducerCell) {
 		// if is under both LowerBound and UpperBound, then is in antidominate area.
 		return reducerCell.pIsBetterRankedThanQ(s.values);
-	}
+	}*/
 
 }
