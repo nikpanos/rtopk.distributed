@@ -88,7 +88,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 	}
 	
 	@Override
-	public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException {
+	public void sendToReducer(MyItem s, ItemType type, int k) throws IOException, InterruptedException {
 		// if is under UpperBound or under LowerBound send to Reducer (Not in dominate area)
 		AngleCell cell;
 		for (int i = 0; i < grid.getCells().length; i++) {
@@ -96,7 +96,11 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 			if (cell.qIsBetterRankedThanP(s.values)) {
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
 			}
+			else if (cell.getCountInAntidominance() >= k) {
+				contextMapper.getCounter(MyCounters.S2_pruned_by_Antidominance_Area).increment(1);
+			}
 			else if (cell.pIsBetterRankedThanQ(s.values)) {
+				cell.incCountInAntidominance();
 				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
 				contextMapper.write(new MyKey(i, ItemType.S_antidom), s);
 			}

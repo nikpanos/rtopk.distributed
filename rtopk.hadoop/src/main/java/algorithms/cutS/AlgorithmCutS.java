@@ -37,7 +37,7 @@ public abstract class AlgorithmCutS {
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */
-	abstract public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException;
+	abstract public void sendToReducer(MyItem s, ItemType type, int k) throws IOException, InterruptedException;
 	
 	/**
 	 * <h1>Set the key of the current Reducer</h1>

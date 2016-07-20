@@ -60,14 +60,18 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 	}
 	
 	@Override
-	public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException {
+	public void sendToReducer(MyItem s, ItemType type, int k) throws IOException, InterruptedException {
 		Cell_W segment;
 		for (int i = 0; i < grid.getSegments().size(); i++) {
 			segment = grid.getSegments().get(i);
 			if(Functions.calculateScore(segment.getLowerBound(), s) > Functions.calculateScore(segment.getUpperBound(), query)) {
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
 			}
+			else if (segment.getCountInAntidominance() >= k) {
+				contextMapper.getCounter(MyCounters.S2_pruned_by_Antidominance_Area).increment(1);
+			}
 			else if (isInLocalAntidominateArea(s, segment)) {
+				segment.incCountInAntidominance();
 				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
 				contextMapper.write(new MyKey(segment.getId(), ItemType.S_antidom), s);
 			}

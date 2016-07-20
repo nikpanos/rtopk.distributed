@@ -172,7 +172,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			if (Dominance.dominate(item.values, q) >= 0) {
 				context.getCounter(MyCounters.S1).increment(1);
 				
-				algorithmCutS.sendToReducer(item, ItemType.S);
+				algorithmCutS.sendToReducer(item, ItemType.S, k);
 				
 			}
 			else {

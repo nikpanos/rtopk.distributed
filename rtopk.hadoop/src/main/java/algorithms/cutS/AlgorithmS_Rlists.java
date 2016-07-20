@@ -85,7 +85,7 @@ public class AlgorithmS_Rlists extends AlgorithmCutS{
 	}
 	
 	@Override
-	public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException {
+	public void sendToReducer(MyItem s, ItemType type, int k) throws IOException, InterruptedException {
 		
 		for (int i = 0; i < lists.length; i++) {
 			

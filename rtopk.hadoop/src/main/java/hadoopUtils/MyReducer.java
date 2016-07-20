@@ -119,11 +119,13 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 				context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
 				context.getCounter(MyCounters.RTOPk_Output).increment(1);
+				context.getCounter(MyCounters.W_topk_in_reducer).increment(1);
 				context.progress();
 			}
 		}
 		else if (key.getType() == ItemType.S_antidom) {
 			for (@SuppressWarnings("unused") MyItem mItem : values) {
+				context.getCounter(MyCounters.S_antidom_in_reducer).increment(1);
 				antidominateAreaCount++;
 				if (antidominateAreaCount >= k) {
 					break;
@@ -133,6 +135,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		else if (key.getType() == ItemType.S) {
 			//algorithmCutS.setReducerKey(key.getKey());
 			for (MyItem mItem : values) {
+				context.getCounter(MyCounters.S2_in_reducer).increment(1);
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 				/*if(algorithmCutS.isInLocalAntidominateArea(myItem)){
 					antidominateAreaCount++;
@@ -164,7 +167,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			}
 			for (MyItem mItem : values) {
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
-				//context.getCounter(MyCounters.W2).increment(1);
+				context.getCounter(MyCounters.W2_in_reducer).increment(1);
 				//brs = new BrsAlgorithm();
 				//long startTime = System.nanoTime();
 				if (algorithm == RtopkAlgorithm.brs) {

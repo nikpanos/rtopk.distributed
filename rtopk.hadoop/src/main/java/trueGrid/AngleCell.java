@@ -7,11 +7,13 @@ public class AngleCell {
 	private double[][] w;
 	double[] q;
 	double[] scoresQ;
+	private int countInAntidominance;
 	
 	public AngleCell(int id, double[] angle1, double[] angle2) {
 		this.id = id;
 		this.angle1 = angle1;
 		this.angle2 = angle2;
+		countInAntidominance = 0;
 		
 		calculateCordsByAngles();
 	}
@@ -19,6 +21,7 @@ public class AngleCell {
 	public AngleCell(int id, double[] angle1, double[] angle2, double[] q) {
 		this(id, angle1, angle2);
 		this.q = q;
+		countInAntidominance = 0;
 
 		calculateScoresQ();
 	}
@@ -136,5 +139,13 @@ public class AngleCell {
 
 	public double[][] getW() {
 		return w;
+	}
+
+	public int getCountInAntidominance() {
+		return countInAntidominance;
+	}
+	
+	public int incCountInAntidominance() {
+		return ++countInAntidominance;
 	}
 }

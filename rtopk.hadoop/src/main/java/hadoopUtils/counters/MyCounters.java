@@ -12,6 +12,7 @@ public enum MyCounters {
 	S2_pruned_by_GridW,
 	S2_pruned_by_RLists,
 	S2_pruned_by_RLists_in_Combiner,
+	S2_pruned_by_Antidominance_Area,
 	//Total_effort_to_load_GridS_in_seconds,
 	//Total_effort_to_load_GridW_in_seconds,
 	//Total_effort_for_pruning_S_in_MilliSeconds,
@@ -24,7 +25,11 @@ public enum MyCounters {
 	S_Elements_In_Antidominance_Area_Of_GridS,
 	Reducers_Early_Terminated,
 	Combiners_Early_Terminated,
-	S_in_antidominate_area
+	S_in_antidominate_area,
+	S2_in_reducer,
+	W2_in_reducer,
+	W_topk_in_reducer,
+	S_antidom_in_reducer
 	//Total_effort_to_create_rtree_in_seconds,
 	//Total_effort_for_rtopk_algorithm_in_seconds,
 	//Total_effort_for_processing_w_in_rtopk_in_seconds,
