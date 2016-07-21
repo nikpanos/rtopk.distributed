@@ -2,13 +2,31 @@ package hadoopUtils;
 
 import model.MyKey;
 
-import org.apache.hadoop.io.WritableComparable;
 import org.apache.hadoop.io.WritableComparator;
 
 public class MyCompositeKeyComparator extends WritableComparator {
     protected MyCompositeKeyComparator() {
         super(MyKey.class, true);
-    }   
+    }
+    
+    @Override 
+    public int compare(byte[] b1, int s1, int l1, byte[] b2, int s2, int l2) {
+    	int i1 = readInt(b1, s1);
+    	int i2 = readInt(b2, s2);
+    	
+    	int comp = i2 - i1;
+        if(0 != comp)
+            return comp;
+        
+        //comp = new ByteWritable.Comparator().compare(b1, s1 + 4, l1 - 4, b2, s2 + 4, l2 - 4);
+        
+        //int j1 = readByte(b1, s1+4);
+        //int j2 = readInt(b2, s2+4);
+        // = (j1 < j2) ? -1 : (j1 == j2) ? 0 : 1;
+         
+        return b1[s1 + 4] - b2[s2 + 4];
+    }
+    /*
     @SuppressWarnings("rawtypes")
     @Override
     public int compare(WritableComparable w1, WritableComparable w2) {
@@ -54,5 +72,5 @@ public class MyCompositeKeyComparator extends WritableComparator {
 		}
 
 		return 0;*/
-    }
+    //}
 }

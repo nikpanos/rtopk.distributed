@@ -2,6 +2,7 @@ package hadoopUtils;
 
 import grids.gridsS.GridS;
 import grids.gridsS.GridS_DominateAndAntidominateArea;
+import grids.gridsS.GridS_RTree;
 import grids.gridsS.GridS_Simple;
 import grids.gridsS.GridS_Tree;
 import grids.gridsS.GridS_TreeDominateAndAntidominateArea;
@@ -38,7 +39,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	// The name of the file that contains the dataset S
 	private static String fileName_S;
 	// The name of the file that contains the dataset W
-	private static String fileName_W;
+	//private static String fileName_W;
 
 	// The grid of dataset S
 	private static GridS gridS;
@@ -62,56 +63,27 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		
 		// initialize �
 		k = context.getConfiguration().getInt("K", 0);
-		if (k <= 0)
-			throw new IllegalArgumentException("K is not set!!!");
 
 		// initialize the filename of the file that contains dataset S
 		fileName_S = context.getConfiguration().get("FileName_S");
 
-		if (fileName_S == null || fileName_S.trim().equals(""))
-			throw new IllegalArgumentException("FileName S is not set!!!");
-
 		// initialize the filename of the file that contains dataset W
-		fileName_W = context.getConfiguration().get("FileName_W");
-
-		if (fileName_W == null || fileName_W.trim().equals(""))
-			throw new IllegalArgumentException("FileName W is not set!!!");
+		//fileName_W = context.getConfiguration().get("FileName_W");
 		
 		String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
 		
-		if (filename.equals(fileName_S)) {
-			isReadingS = true;
-		}
-		else if (filename.equals(fileName_W)) {
-			isReadingS = false;
-		}
-		else {
-			// Throw exception that the filenames are wrong
-			throw new IllegalArgumentException("Wrong Filenames!!!");
-		}
+		isReadingS = filename.equals(fileName_S);
 
 		// Initialize the dimensions number of the query
-		int queryDimentions = context.getConfiguration().getInt(
-				"queryDimentions", 0);
-
-		if (queryDimentions < 1)
-			throw new IllegalArgumentException("Query Dimentions is not set!!!");
+		int queryDimentions = context.getConfiguration().getInt("queryDimentions", 0);
 
 		// Initialize the array that contains the value of each dimension of the query
 		q = new float[queryDimentions];
 
 		// add values to the array
 		for (int i = 0; i < queryDimentions; i++) {
-			float value = context.getConfiguration().getFloat("queryDim" + i,
-					-1);
-			if (value < 0)
-				throw new IllegalArgumentException("Dimention " + i
-						+ " is not set!!!");
-			q[i] = value;
+			q[i] = context.getConfiguration().getFloat("queryDim" + i, -1);
 		}
-				
-		if(context.getCacheFiles().length!=2)
-			throw new IllegalArgumentException("Files that contains the Grid for S and W is not set!!!");
 		
 		URI gridSPath = context.getCacheFiles()[0];
 		URI gridWPath = context.getCacheFiles()[1];
@@ -125,7 +97,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		
 		if (!isReadingS) {
 			context.setStatus("Create GridS");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 			
 			// create the grid for dataset S
 			//long startTime = System.nanoTime();
@@ -141,7 +113,10 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 				break;
 			case "TreeDominateAndAntidominateArea":
 				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
-				break;	
+				break;
+			case "RTree":
+				gridS = new GridS_RTree(gridSPath,q);
+				break;
 			default:
 				throw new IllegalArgumentException("Grid for S is not correct!!!");
 			}
@@ -149,7 +124,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 					
 			context.setStatus("GridS Created!!!");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 			
 			int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
 			if (antidominateAreaElementsCount > 0) {
@@ -161,11 +136,11 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		}
 		//else {
 			context.setStatus("Create GridW");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 			
 			switch (context.getConfiguration().get("AlgorithmForS")) {
 			case "RealBounds":
-				algorithmCutS = new AlgorithmS_RealBounds(gridWPath, q, context);
+				algorithmCutS = new AlgorithmS_RealBounds(gridWSegmentation, q, context);
 				break;
 			case "Rlists":
 				algorithmCutS = new AlgorithmS_Rlists(k,gridWPath,context);
@@ -178,11 +153,11 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 				break;
 			default:
 				throw new IllegalArgumentException("Algorithm for S is not correct!!!");
-			};
+			}
 			
 	
 			context.setStatus("GridW Created!!!");
-			System.out.println(context.getStatus());
+			//System.out.println(context.getStatus());
 		//}
 	}
 
@@ -201,7 +176,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			if (Dominance.dominate(item.values, q) >= 0) {
 				context.getCounter(MyCounters.S1).increment(1);
 				
-				algorithmCutS.sendToReducer(item, ItemType.S);
+				algorithmCutS.sendToReducer(item, ItemType.S, k);
 				
 			}
 			else {
@@ -221,21 +196,22 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//item.setItemType(ItemType.W);
 			context.getCounter(MyCounters.W).increment(1);
 			
-			//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
-			int reducerNumber = algorithmCutS.getReducerNumber(item, gridWSegmentation);
-			
 			int[] range = gridS.getCount(item, q);
 			
 			if(k < range[0])
 				context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
-			else if(range[1] < k) {
-				//item.setItemType(ItemType.W_InTopK);
-				context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
-				context.getCounter(MyCounters.W_in_RTOPk).increment(1);
-			}
 			else {
-				context.write(new MyKey(reducerNumber, ItemType.W), item);
-				context.getCounter(MyCounters.W1).increment(1);
+				//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
+				int reducerNumber = algorithmCutS.getReducerNumber(item, gridWSegmentation);
+				if(range[1] < k) {
+					//item.setItemType(ItemType.W_InTopK);
+					context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
+					context.getCounter(MyCounters.W_in_RTOPk).increment(1);
+				}
+				else {
+					context.write(new MyKey(reducerNumber, ItemType.W), item);
+					context.getCounter(MyCounters.W1).increment(1);
+				}
 			}
 			
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;

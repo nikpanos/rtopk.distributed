@@ -71,7 +71,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 					< Functions.calculateScore(grid.getSegments().get(i).getUpperBound(), query)
 					){
 				
-				contextMapper.getCounter(MyCounters.S2).increment(1);
+				contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 				contextMapper.write(new MyKey(grid.getSegments().get(i).getId(), type), s);
 			}
 			else

@@ -71,7 +71,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 			// if is not in dominate area
 			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
 				if(lists[i].add(s)){
-					contextMapper.getCounter(MyCounters.S2).increment(1);
+					contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 					contextMapper.write(new MyKey(segment.getId(), type), s);
 				}
 				else

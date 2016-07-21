@@ -8,7 +8,6 @@ import java.net.URI;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
 
 import algorithms.Functions;
 import model.Cell_W;
@@ -20,7 +19,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 
 	private Mapper<Object, Text, MyKey, MyItem>.Context contextMapper;
 	private float[] query;
-	private Cell_W reducerCell;
+	//private Cell_W reducerCell;
 		
 	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query, Mapper<Object, Text, MyKey, MyItem>.Context contextMapper) throws IOException {
 		super();
@@ -36,7 +35,7 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 		//contextMapper.getCounter(MyCounters.Total_effort_to_load_GridW_in_seconds).increment(estimatedTime);
 	}
 	
-	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query, Reducer<MyKey, MyItem, Text, Text>.Context contextReducer) throws IOException {
+	public AlgorithmsS_NotRealBounds(URI gridWPath, float[] query) throws IOException {
 		super();
 		this.query = query;
 		
@@ -50,32 +49,41 @@ public class AlgorithmsS_NotRealBounds extends AlgorithmCutS {
 	}
 	
 	@Override
-	public void sendToReducer(MyItem s, ItemType type) throws IOException, InterruptedException {
+	public void sendToReducer(MyItem s, ItemType type, int k) throws IOException, InterruptedException {
 		Cell_W segment;
 		for (int i=0;i<grid.getSegments().size();i++) {
 			segment = grid.getSegments().get(i);
-			// if is not in dominate area
-			if(Functions.calculateScore(segment.getLowerBound(), s) <= Functions.calculateScore(segment.getUpperBound(), query)){
-				contextMapper.getCounter(MyCounters.S2).increment(1);
+			if(Functions.calculateScore(segment.getLowerBound(), s) > Functions.calculateScore(segment.getUpperBound(), query)) {
+				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
+			}
+			else if (segment.getCountInAntidominance() >= k) {
+				contextMapper.getCounter(MyCounters.S2_pruned_by_Antidominance_Area).increment(1);
+			}
+			else if (isInLocalAntidominateArea(s, segment)) {
+				segment.incCountInAntidominance();
+				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
+				contextMapper.write(new MyKey(segment.getId(), ItemType.S_antidom), s);
+			}
+			else {
+				contextMapper.getCounter(MyCounters.S2_by_mapper).increment(1);
 				contextMapper.write(new MyKey(segment.getId(), type), s);
 			}
-			else
-				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
+				
 		}		
 	}
 
-	@Override
+	/*@Override
 	public void setReducerKey(int key) {
-		for(Cell_W cell : getGridW().getSegments()){
+		for(Cell_W cell : grid.getSegments()){
 			if(cell.getId()==key) {
 				reducerCell = cell;
 				break;
 			}
 		}
-	}
+	}*/
 
 	@Override
-	public boolean isInLocalAntidominateArea(MyItem s) {
+	public boolean isInLocalAntidominateArea(MyItem s, Cell_W reducerCell) {
 		// if is in antidominate area
 		if (Functions.calculateScore(reducerCell.getUpperBound(),s) 
 				< Functions.calculateScore(reducerCell.getLowerBound(), query)) {

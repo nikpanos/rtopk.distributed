@@ -8,6 +8,7 @@ public class Cell_W {
 	private int tupleId;
 	private float[] lowerBound;
 	private float[] upperBound;
+	private int countInAntidominance;
 	
 	/**
 	 * @param dimensionsNumber the number of dimensions
@@ -18,6 +19,7 @@ public class Cell_W {
 		lowerBound = new float[dimensionsNumber];
 		upperBound = new float[dimensionsNumber];
 		this.tupleId = tupleId;
+		countInAntidominance = 0;
 	}
 
 	/**
@@ -79,7 +81,12 @@ public class Cell_W {
 		this.tupleId = tupleId;
 	}
 
+	public int getCountInAntidominance() {
+		return countInAntidominance;
+	}
 	
-	
+	public int incCountInAntidominance() {
+		return ++countInAntidominance;
+	}
 	
 }

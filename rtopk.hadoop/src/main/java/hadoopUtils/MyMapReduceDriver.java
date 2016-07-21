@@ -40,16 +40,16 @@ public class MyMapReduceDriver {
 	public void computeRTOPk(int k, Path pathS, Path pathGridS,
 			Path pathW, Path pathGridW, Path pathOutput, float[] query, int reducersNo,
 			String algorithmForS, String gridForS, String algorithmForRtopk,
-			int gridWSegmentation, boolean combineFiles, String jobName)
+			int gridWSegmentation, boolean combineFiles, long inputSplitSize, boolean useCombiner, String jobName)
 			throws IOException, ClassNotFoundException, InterruptedException {
 		Job job = Job.getInstance();
 
 		//job.getConfiguration().set("mapreduce.map.memory.mb", "2560");
-		//job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2147483648");
+		//job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2560m");
 		//mapreduce.map.java.opts
 
-		//job.getConfiguration().set("mapreduce.reduce.memory.mb", "5632");
-		//job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx4224m -Xms512m");
+		//job.getConfiguration().set("mapreduce.reduce.memory.mb", "2560");
+		//job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2560m");
 		//mapreduce.reduce.java.opts
 		
 		long milliSeconds = 1000 * 60 * 60 * 3; //3 hours
@@ -83,7 +83,11 @@ public class MyMapReduceDriver {
 		//job.setSortComparatorClass(MyCompositeKeyComparator.class);
 		job.setOutputKeyClass(Text.class);
 		job.setOutputValueClass(Text.class);
-
+		
+		if (useCombiner) {
+			job.setCombinerClass(MyCombiner.class);
+			job.setCombinerKeyGroupingComparatorClass(MyCompositeKeyComparator.class);
+		}
 		
 		job.setReducerClass(MyReducer.class);
 		
@@ -101,15 +105,19 @@ public class MyMapReduceDriver {
 		else {
 			FileInputFormat.addInputPath(job, pathS);
 			FileInputFormat.addInputPath(job, pathW);
-			FileInputFormat.setMaxInputSplitSize(job, 33554432);
+			FileInputFormat.setMaxInputSplitSize(job, inputSplitSize);
 			
 			job.setMapperClass(MyMap.class);
 		}
 		
 		job.setNumReduceTasks(reducersNo);
+		//job.setNumReduceTasks(1);
 		
 		job.setOutputFormatClass(TextOutputFormat.class);
 		FileOutputFormat.setOutputPath(job, pathOutput);
+		
+		//job.getConfiguration().setBoolean(Job.MAP_OUTPUT_COMPRESS, true);
+		//job.getConfiguration().setClass(Job.MAP_OUTPUT_COMPRESS_CODEC, org.apache.hadoop.io.compress.SnappyCodec.class, CompressionCodec.class);
 
 		@SuppressWarnings("unused")
 		boolean success = job.waitForCompletion(true);

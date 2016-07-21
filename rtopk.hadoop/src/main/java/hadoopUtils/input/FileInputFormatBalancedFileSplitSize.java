@@ -468,7 +468,7 @@ public abstract class FileInputFormatBalancedFileSplitSize<K, V> extends InputFo
 					blockSize[i] = files.get(i).getBlockSize();
 					// ���������� �� ������� ��� ��� ����� ��� ����������� ��� �� i ������ ��� splitSize 
 					weightSplitSize[i] = (double) length[i]/totalbytes;
-					System.out.println("                        ------ split size percentage: " + weightSplitSize[i]);
+					//System.out.println("                        ------ split size percentage: " + weightSplitSize[i]);
 					splitSize[i] = computeSplitSize(blockSize[i], minSize,
 							maxSize,weightSplitSize[i]);
 

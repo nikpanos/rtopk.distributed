@@ -12,18 +12,23 @@ public class Rta {
 	private S_Item_TopK[] buffer = null;
 	
 	public boolean isWeightVectorInRtopk(List<MyItem> s, MyItem w, float[] q, int k) {
+		if (s.size() < k) {
+			return true;
+		}
+		
 		threshold = Float.MAX_VALUE;
 		if (buffer != null) {
 			threshold = findBufferMax(buffer, w);
 		}
 		float scoreq = Functions.calculateScore(w, q);
 		if (scoreq <= threshold) {
-			buffer = TopK(w, s, k);
+			buffer = TopK(w, s, k, scoreq);
 			if (scoreq <= buffer[0].score) {
 				return true;
 			}
 		}
 		return false;
+		
 	}
 	
 	public List<MyItem> computeRTOPk(List<MyItem> S, MyItem[] W, float[] q, int k) {
@@ -49,11 +54,10 @@ public class Rta {
 		return maxScore;
 	}
 
-	private S_Item_TopK[] TopK(MyItem W, List<MyItem> S, int k) {
+	private S_Item_TopK[] TopK(MyItem W, List<MyItem> S, int k, float scoreq) {
 
 		PriorityQueue<S_Item_TopK> queue = new PriorityQueue<S_Item_TopK>(k, new myComparator());
-
-		// �������� �� �������� ���� ����� �� ��� score ��� �� ���� ��������
+		
 		float tmpScore;
 		for (int i = 0; i < S.size(); i++) {
 			tmpScore = Functions.calculateScore(W, S.get(i));
@@ -61,12 +65,20 @@ public class Rta {
 				S_Item_TopK item = new S_Item_TopK(S.get(i));
 				item.score = tmpScore;
 				queue.add(item);
+				
+				if ((queue.size() == k) && (queue.peek().score < scoreq)) {
+					break;
+				}
 			}
 			else if (queue.peek().score > tmpScore) {
 				S_Item_TopK item = new S_Item_TopK(S.get(i));
 				item.score = tmpScore;
 				queue.poll();
 				queue.add(item);
+				
+				if (queue.peek().score < scoreq) {
+					break;
+				}
 			}
 		}
 
