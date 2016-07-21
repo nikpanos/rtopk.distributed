@@ -2,6 +2,7 @@ package hadoopUtils;
 
 import grids.gridsS.GridS;
 import grids.gridsS.GridS_DominateAndAntidominateArea;
+import grids.gridsS.GridS_RTree;
 import grids.gridsS.GridS_Simple;
 import grids.gridsS.GridS_Tree;
 import grids.gridsS.GridS_TreeDominateAndAntidominateArea;
@@ -112,7 +113,10 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 				break;
 			case "TreeDominateAndAntidominateArea":
 				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
-				break;	
+				break;
+			case "RTree":
+				gridS = new GridS_RTree(gridSPath,q);
+				break;
 			default:
 				throw new IllegalArgumentException("Grid for S is not correct!!!");
 			}
