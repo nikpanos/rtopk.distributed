@@ -68,7 +68,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 				contextMapper.getCounter(MyCounters.S2_pruned_by_GridW).increment(1);
 			}
 			else if (segment.getCountInAntidominance() >= k) {
-				contextMapper.getCounter(MyCounters.S2_pruned_by_Antidominance_Area).increment(1);
+				contextMapper.getCounter(MyCounters.S2_pruned_by_Cell_Antidominance_Area).increment(1);
 			}
 			else if (isInLocalAntidominateArea(s, segment)) {
 				segment.incCountInAntidominance();

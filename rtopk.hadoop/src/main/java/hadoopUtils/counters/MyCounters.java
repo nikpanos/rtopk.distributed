@@ -12,7 +12,7 @@ public enum MyCounters {
 	S2_pruned_by_GridW,
 	S2_pruned_by_RLists,
 	S2_pruned_by_RLists_in_Combiner,
-	S2_pruned_by_Antidominance_Area,
+	S2_pruned_by_Cell_Antidominance_Area,
 	//Total_effort_to_load_GridS_in_seconds,
 	//Total_effort_to_load_GridW_in_seconds,
 	//Total_effort_for_pruning_S_in_MilliSeconds,
