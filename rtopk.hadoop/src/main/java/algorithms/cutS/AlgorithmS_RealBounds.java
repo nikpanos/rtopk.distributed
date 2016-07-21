@@ -101,7 +101,7 @@ public class AlgorithmS_RealBounds extends AlgorithmCutS {
 			}
 			else if (cell.pIsBetterRankedThanQ(s.values)) {
 				cell.incCountInAntidominance();
-				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
+				contextMapper.getCounter(MyCounters.S2_by_mapper_antidominance_area).increment(1);
 				contextMapper.write(new MyKey(i, ItemType.S_antidom), s);
 			}
 			else {

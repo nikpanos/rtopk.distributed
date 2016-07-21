@@ -72,7 +72,7 @@ public class AlgorithmS_CombineNotRealBoundsAndRLists extends AlgorithmCutS {
 			}
 			else if (isInLocalAntidominateArea(s, segment)) {
 				segment.incCountInAntidominance();
-				contextMapper.getCounter(MyCounters.S_in_antidominate_area).increment(1);
+				contextMapper.getCounter(MyCounters.S2_by_mapper_antidominance_area).increment(1);
 				contextMapper.write(new MyKey(segment.getId(), ItemType.S_antidom), s);
 			}
 			else {
