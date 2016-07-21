@@ -20,13 +20,15 @@ import model.MyItem;
 public class GridS_RTree extends GridS {
 	
 	private float[] q;
+	private int k;
 	private RTree<Integer, Rectangle> tree;
 	private int antidominateAreaCount = 0;
 	
-	public GridS_RTree(URI gridSPath,float[] query) throws IOException {
+	public GridS_RTree(URI gridSPath, float[] query, int k) throws IOException {
 		super();
 		this.q = query;
 		tree = RTree.star().create();
+		this.k = k;
 		FileParser.parseGridSFile(gridSPath, this);
 	}
 
@@ -71,6 +73,9 @@ public class GridS_RTree extends GridS {
 				else if (Functions.calculateScore(w, e.geometry().low()) < scoreQ) {
 					result[1] += e.value();
 				}
+				if (result[0] >= k) {
+					break;
+				}
 			}
 		}
 		else {
@@ -85,6 +90,9 @@ public class GridS_RTree extends GridS {
 					int[] counts = getCountOfNode(w, child, scoreQ);
 					result[0] += counts[0];
 					result[1] += counts[1];
+				}
+				if (result[0] >= k) {
+					break;
 				}
 			}
 		}

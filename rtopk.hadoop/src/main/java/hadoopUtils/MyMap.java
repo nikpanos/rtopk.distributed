@@ -115,7 +115,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
 				break;
 			case "RTree":
-				gridS = new GridS_RTree(gridSPath,q);
+				gridS = new GridS_RTree(gridSPath, q, k);
 				break;
 			default:
 				throw new IllegalArgumentException("Grid for S is not correct!!!");

@@ -97,7 +97,9 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			datasetS = new ArrayList<MyItem>();
 			//datasetW = new ArrayList<MyItem>();
 		}
-		
+		else {
+			algorithm = RtopkAlgorithm.count;
+		}
 		
 		
 	}
@@ -168,6 +170,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			for (MyItem mItem : values) {
 				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 				context.getCounter(MyCounters.W2_in_reducer).increment(1);
+				//context.progress();
 				//brs = new BrsAlgorithm();
 				//long startTime = System.nanoTime();
 				if (algorithm == RtopkAlgorithm.brs) {

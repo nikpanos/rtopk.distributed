@@ -40,17 +40,22 @@ public class MyMapReduceDriver {
 	public void computeRTOPk(int k, Path pathS, Path pathGridS,
 			Path pathW, Path pathGridW, Path pathOutput, float[] query, int reducersNo,
 			String algorithmForS, String gridForS, String algorithmForRtopk,
-			int gridWSegmentation, boolean combineFiles, long inputSplitSize, boolean useCombiner, String jobName)
+			int gridWSegmentation, boolean combineFiles, long inputSplitSize, boolean useCombiner,
+			int mapMemoryMB, int reduceMemoryMB, String jobName)
 			throws IOException, ClassNotFoundException, InterruptedException {
 		Job job = Job.getInstance();
 
-		//job.getConfiguration().set("mapreduce.map.memory.mb", "2560");
-		//job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2560m");
-		//mapreduce.map.java.opts
-
-		//job.getConfiguration().set("mapreduce.reduce.memory.mb", "2560");
-		//job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx2560m");
-		//mapreduce.reduce.java.opts
+		if (mapMemoryMB != -1) {
+			job.getConfiguration().set("mapreduce.map.memory.mb", mapMemoryMB + "");
+			job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx" + mapMemoryMB + "m");
+			//mapreduce.map.java.opts
+		}
+		
+		if (reduceMemoryMB != -1) {
+			job.getConfiguration().set("mapreduce.reduce.memory.mb", reduceMemoryMB + "");
+			job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx" + reduceMemoryMB + "m");
+			//mapreduce.reduce.java.opts
+		}
 		
 		long milliSeconds = 1000 * 60 * 60 * 3; //3 hours
 		//job.getConfiguration().setLong("mapreduce.task.timeout", milliSeconds);

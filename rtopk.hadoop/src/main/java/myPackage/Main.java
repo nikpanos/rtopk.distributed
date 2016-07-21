@@ -65,10 +65,19 @@ public class Main {
 		boolean combineFiles = Boolean.parseBoolean(properties.getProperty("combineFiles"));
 		long inputSplitSize = Long.parseLong(properties.getProperty("inputSplitSize"));
 		boolean useCombiner = Boolean.parseBoolean(properties.getProperty("useCombiner"));
+		int mapMemoryMB = -1;
+		int reduceMemoryMB = -1;
+		if (properties.getProperty("mapMemoryMB") != null) {
+			mapMemoryMB = Integer.parseInt(properties.getProperty("mapMemoryMB"));
+		}
+		if (properties.getProperty("reduceMemoryMB") != null) {
+			reduceMemoryMB = Integer.parseInt(properties.getProperty("reduceMemoryMB"));
+		}
 
 		MyMapReduceDriver driver = new MyMapReduceDriver();
 		driver.computeRTOPk(k, pathS, pathGridS, pathW, pathGridW, pathOutput, query, reducersNo, algorithmForS,
-				gridForS, algorithmForRtopk, gridWSegmentation, combineFiles, inputSplitSize, useCombiner, jobName);
+				gridForS, algorithmForRtopk, gridWSegmentation, combineFiles, inputSplitSize, useCombiner,
+				mapMemoryMB, reduceMemoryMB, jobName);
 
 	}
 
