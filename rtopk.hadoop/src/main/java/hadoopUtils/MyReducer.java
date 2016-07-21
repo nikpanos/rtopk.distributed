@@ -87,7 +87,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		context.setStatus("GridW Created!!!");*/
 		//System.out.println(context.getStatus());
 		
-		String rtopkAlg = "BRS";//context.getConfiguration().get("AlgorithmForRtopk");
+		String rtopkAlg = context.getConfiguration().get("AlgorithmForRtopk");
 		if (rtopkAlg.equals("BRS")) {
 			algorithm = RtopkAlgorithm.brs;
 			tree = RTree.star().maxChildren(5).create();
