@@ -13,7 +13,10 @@ public class Rta {
 	private S_Item_TopK[] buffer = null;
 	
 	public boolean isWeightVectorInRtopk(List<MyItem> s, MyItem w, float[] q, int k) {
-		if (s.size() < k) {
+		if (k == 0) {
+			return false;
+		}
+		else if (s.size() < k) {
 			return true;
 		}
 		
