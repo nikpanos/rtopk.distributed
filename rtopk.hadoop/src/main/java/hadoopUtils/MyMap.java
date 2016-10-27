@@ -1,11 +1,5 @@
 package hadoopUtils;
 
-import grids.gridsS.GridS;
-import grids.gridsS.GridS_DominateAndAntidominateArea;
-import grids.gridsS.GridS_RTree;
-import grids.gridsS.GridS_Simple;
-import grids.gridsS.GridS_Tree;
-import grids.gridsS.GridS_TreeDominateAndAntidominateArea;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
@@ -42,12 +36,12 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	//private static String fileName_W;
 
 	// The grid of dataset S
-	private static GridS gridS;
+	//private static GridS gridS;
 	
 	// The grid of dataset W
 	private static AlgorithmCutS algorithmCutS;
 		
-	private static boolean antidominateAreaElementsMoreThanK;
+	//private static boolean antidominateAreaElementsMoreThanK;
 	
 	private boolean isReadingS;
 	
@@ -85,55 +79,55 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			q[i] = context.getConfiguration().getFloat("queryDim" + i, -1);
 		}
 		
-		URI gridSPath = context.getCacheFiles()[0];
-		URI gridWPath = context.getCacheFiles()[1];
+		//URI gridSPath = context.getCacheFiles()[0];
+		URI gridWPath = context.getCacheFiles()[0];
 		
 		try {
-			gridSPath = new URI(new Path(gridSPath.getPath()).getName());
+			//gridSPath = new URI(new Path(gridSPath.getPath()).getName());
 			gridWPath = new URI(new Path(gridWPath.getPath()).getName());
 		} catch (IllegalArgumentException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		
-		if (!isReadingS) {
-			context.setStatus("Create GridS");
+		//if (!isReadingS) {
+			//context.setStatus("Create GridS");
 			//System.out.println(context.getStatus());
 			
 			// create the grid for dataset S
 			//long startTime = System.nanoTime();
-			switch (context.getConfiguration().get("GridForS")) {
-			case "Simple":
-				gridS = new GridS_Simple(gridSPath);
-				break;
-			case "DominateAndAntidominateArea":
-				gridS = new GridS_DominateAndAntidominateArea(gridSPath,q);			
-				break;
-			case "Tree":
-				gridS = new GridS_Tree(gridSPath,q);			
-				break;
-			case "TreeDominateAndAntidominateArea":
-				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
-				break;
-			case "RTree":
-				gridS = new GridS_RTree(gridSPath, q, k);
-				break;
-			default:
-				throw new IllegalArgumentException("Grid for S is not correct!!!");
-			}
+			//switch (context.getConfiguration().get("GridForS")) {
+			//case "Simple":
+			//	gridS = new GridS_Simple(gridSPath);
+			//	break;
+			//case "DominateAndAntidominateArea":
+			//	gridS = new GridS_DominateAndAntidominateArea(gridSPath,q);			
+			//	break;
+			//case "Tree":
+			//	gridS = new GridS_Tree(gridSPath,q);			
+			//	break;
+			//case "TreeDominateAndAntidominateArea":
+			//	gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
+			//	break;
+			//case "RTree":
+			//	gridS = new GridS_RTree(gridSPath, q, k);
+			//	break;
+			//default:
+			//	throw new IllegalArgumentException("Grid for S is not correct!!!");
+			//}
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 					
-			context.setStatus("GridS Created!!!");
+			//context.setStatus("GridS Created!!!");
 			//System.out.println(context.getStatus());
 			
-			int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
-			if (antidominateAreaElementsCount > 0) {
-				context.getCounter(MyCounters.S_Elements_In_Antidominance_Area_Of_GridS).setValue(antidominateAreaElementsCount);
-			}
-			if(antidominateAreaElementsCount>=k)
-				antidominateAreaElementsMoreThanK = true;
+			//int antidominateAreaElementsCount = gridS.getAntidominateAreaCount(q);
+			//if (antidominateAreaElementsCount > 0) {
+			//	context.getCounter(MyCounters.S_Elements_In_Antidominance_Area_Of_GridS).setValue(antidominateAreaElementsCount);
+			//}
+			//if(antidominateAreaElementsCount>=k)
+			//	antidominateAreaElementsMoreThanK = true;
 		
-		}
+		//}
 		//else {
 			context.setStatus("Create GridW");
 			//System.out.println(context.getStatus());
@@ -196,23 +190,23 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//item.setItemType(ItemType.W);
 			context.getCounter(MyCounters.W).increment(1);
 			
-			int[] range = gridS.getCount(item, q);
+			//int[] range = gridS.getCount(item, q);
 			
-			if(k < range[0])
-				context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
-			else {
+			//if(k < range[0])
+			//	context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
+			//else {
 				//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
 				int reducerNumber = algorithmCutS.getReducerNumber(item, gridWSegmentation);
-				if(range[1] < k) {
+			//	if(range[1] < k) {
 					//item.setItemType(ItemType.W_InTopK);
-					context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
-					context.getCounter(MyCounters.W_in_RTOPk).increment(1);
-				}
-				else {
+			//		context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
+			//		context.getCounter(MyCounters.W_in_RTOPk).increment(1);
+			//	}
+			//	else {
 					context.write(new MyKey(reducerNumber, ItemType.W), item);
 					context.getCounter(MyCounters.W1).increment(1);
-				}
-			}
+			//	}
+			//}
 			
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			
@@ -220,7 +214,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		}
 	}
 
-	public void run(Context context) throws IOException, InterruptedException {
+	/*public void run(Context context) throws IOException, InterruptedException {
 		setup(context);
 		try {
 			if (!antidominateAreaElementsMoreThanK) {
@@ -231,7 +225,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		} finally {
 			cleanup(context);
 		}
-	}
+	}*/
 	
 	// Cleanup executed once at the end of the Mapper
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html

@@ -72,7 +72,7 @@ public class MyMapReduceDriver {
 		job.getConfiguration().set("AlgorithmForRtopk", algorithmForRtopk);
 		job.getConfiguration().set("GridForS", gridForS);
 		job.getConfiguration().setInt("gridWSegmentation", gridWSegmentation);
-		job.addCacheFile( pathGridS.toUri() );
+		//job.addCacheFile( pathGridS.toUri() );
 		job.addCacheFile( pathGridW.toUri() );
 		
 		job.getConfiguration().setInt("queryDimentions", query.length);
