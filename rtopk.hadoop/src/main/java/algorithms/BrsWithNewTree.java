@@ -94,8 +94,11 @@ public class BrsWithNewTree {
 	}
 	
 	public boolean isWeightVectorInRtopk(float[] queryPoint, RTree<Object, Point> tree, MyItem weight) {
-		if ((tree.size() == 0) || (k == 0)) {
+		if (k == 0) {
 			return false;
+		}
+		else if (tree.size() < k) {
+			return true;
 		}
 		
 		this.weightVector = weight;
