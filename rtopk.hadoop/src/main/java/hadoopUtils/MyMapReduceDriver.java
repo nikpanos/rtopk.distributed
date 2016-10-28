@@ -123,23 +123,32 @@ public class MyMapReduceDriver {
 		
 		//job.getConfiguration().setBoolean(Job.MAP_OUTPUT_COMPRESS, true);
 		//job.getConfiguration().setClass(Job.MAP_OUTPUT_COMPRESS_CODEC, org.apache.hadoop.io.compress.SnappyCodec.class, CompressionCodec.class);
-
+		
+		long startTime = System.currentTimeMillis();
+		
 		@SuppressWarnings("unused")
 		boolean success = job.waitForCompletion(true);
+		
+		long endTime = System.currentTimeMillis();
 		
 		Path resultsPath = new Path(pathOutput + Path.SEPARATOR + "Results.txt");
 		Configuration conf = job.getConfiguration();
 		FileSystem fs = FileSystem.get(conf);
 		OutputStream out = fs.create(resultsPath).getWrappedStream();
-		
-		for (CounterGroup group : job.getCounters()) {
-			out.write(new String("* Counter Group" + " \t" + group.getDisplayName() + "\n").getBytes());
-			out.write(new String(" number of counters in this group" + " \t" + group.size() + "\n").getBytes());
-			for (Counter counter : group) {
-				out.write(new String("- "+ counter.getDisplayName() + " \t "+counter.getValue() + "\n").getBytes());
+		try {
+			out.write(new String("Total time elapsed (ms): " + (endTime - startTime) + "\n").getBytes());
+			for (CounterGroup group : job.getCounters()) {
+				out.write(new String("* Counter Group" + " \t" + group.getDisplayName() + "\n").getBytes());
+				out.write(new String(" number of counters in this group" + " \t" + group.size() + "\n").getBytes());
+				for (Counter counter : group) {
+					out.write(new String("- "+ counter.getDisplayName() + " \t "+counter.getValue() + "\n").getBytes());
+				}
 			}
 		}
-		out.close();
+		finally {
+			out.close();
+			fs.close();
+		}
 	}
 
 }
