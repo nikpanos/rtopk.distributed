@@ -3,6 +3,8 @@ package hadoopUtils;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 
 import model.ItemType;
@@ -10,7 +12,12 @@ import model.MyItem;
 import model.MyKey;
 import model.RtopkAlgorithm;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Counter;
+import org.apache.hadoop.mapreduce.CounterGroup;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import com.github.davidmoten.rtree.RTree;
@@ -113,7 +120,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		//System.out.println(context.getStatus());
 		
 		//long startTime = System.nanoTime();
-		
+		try {
 		MyItem myItem;
 		
 		if (key.getType() == ItemType.W_InTopK) {
@@ -191,7 +198,27 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				context.progress();
 			}
 		}
-		
+		}
+		catch (Exception ex) {
+			Path debugPath = new Path("debug/a.txt");
+			Configuration conf = context.getConfiguration();
+			FileSystem fs = FileSystem.get(conf);
+			try {
+				if (!fs.exists(debugPath)) {
+					PrintStream out = new PrintStream(fs.create(debugPath).getWrappedStream());
+					try {
+						out.append(ex.getMessage() + "\n");
+						ex.printStackTrace(out);
+					}
+					finally {
+						out.close();
+					}
+				}
+			}
+			finally {
+				fs.close();
+			}
+		}
 		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 		/*switch (key.getType()) {
 		case S:

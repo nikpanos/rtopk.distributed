@@ -69,7 +69,6 @@ public class DocumentLineRecordReader extends
 	private boolean isCompressedInput;
 	private Decompressor decompressor;
 	private byte[] recordDelimiterBytes;
-	// Με αυτή την μεταβλητή θα βρίσκουμε το path του αρχείου
 	private Path path1;
 
 	public DocumentLineRecordReader() {
@@ -89,7 +88,6 @@ public class DocumentLineRecordReader extends
 		end = start + split.getLength();
 		final Path file = split.getPath();
 		
-		// Θέτουμε το path του αρχείου
 		path1 = file;
 		
 		// open the file and seek to the start of the split
@@ -223,7 +221,6 @@ public class DocumentLineRecordReader extends
 
 	@Override
 	public DocumentLine getCurrentValue() {
-		// Θέτουμε στο value το path του αρχείου
 		value.setFile(new Text(path1.getName().toString()));
 		return value;
 	}
