@@ -22,6 +22,7 @@ import algorithms.cutS.AlgorithmS_CombineNotRealBoundsAndRLists;
 import algorithms.cutS.AlgorithmS_RealBounds;
 import algorithms.cutS.AlgorithmS_Rlists;
 import algorithms.cutS.AlgorithmsS_NotRealBounds;
+import grids.gridsS.*;
 
 public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 
@@ -36,7 +37,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	//private static String fileName_W;
 
 	// The grid of dataset S
-	//private static GridS gridS;
+	private static GridS gridS;
 	
 	// The grid of dataset W
 	private static AlgorithmCutS algorithmCutS;
@@ -64,7 +65,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		// initialize the filename of the file that contains dataset W
 		//fileName_W = context.getConfiguration().get("FileName_W");
 		
-		String filename = ((FileSplit) context.getInputSplit()).getPath().getName();
+		String filename = ((FileSplit) context.getInputSplit()).getPath().getParent().getName();
 		
 		isReadingS = filename.equals(fileName_S);
 
@@ -79,41 +80,41 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			q[i] = context.getConfiguration().getFloat("queryDim" + i, -1);
 		}
 		
-		//URI gridSPath = context.getCacheFiles()[0];
+		URI gridSPath = context.getCacheFiles()[0];
 		URI gridWPath = context.getCacheFiles()[0];
 		
 		try {
-			//gridSPath = new URI(new Path(gridSPath.getPath()).getName());
+			gridSPath = new URI(new Path(gridSPath.getPath()).getName());
 			gridWPath = new URI(new Path(gridWPath.getPath()).getName());
 		} catch (IllegalArgumentException | URISyntaxException e) {
 			e.printStackTrace();
 		}
 		
-		//if (!isReadingS) {
+		if (!isReadingS) {
 			//context.setStatus("Create GridS");
 			//System.out.println(context.getStatus());
 			
 			// create the grid for dataset S
 			//long startTime = System.nanoTime();
-			//switch (context.getConfiguration().get("GridForS")) {
-			//case "Simple":
-			//	gridS = new GridS_Simple(gridSPath);
-			//	break;
-			//case "DominateAndAntidominateArea":
-			//	gridS = new GridS_DominateAndAntidominateArea(gridSPath,q);			
-			//	break;
-			//case "Tree":
-			//	gridS = new GridS_Tree(gridSPath,q);			
-			//	break;
-			//case "TreeDominateAndAntidominateArea":
-			//	gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
-			//	break;
-			//case "RTree":
-			//	gridS = new GridS_RTree(gridSPath, q, k);
-			//	break;
-			//default:
-			//	throw new IllegalArgumentException("Grid for S is not correct!!!");
-			//}
+			switch (context.getConfiguration().get("GridForS")) {
+			case "Simple":
+				gridS = new GridS_Simple(gridSPath);
+				break;
+			case "DominateAndAntidominateArea":
+				gridS = new GridS_DominateAndAntidominateArea(gridSPath,q);			
+				break;
+			case "Tree":
+				gridS = new GridS_Tree(gridSPath,q);			
+				break;
+			case "TreeDominateAndAntidominateArea":
+				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
+				break;
+			case "RTree":
+				gridS = new GridS_RTree(gridSPath, q, k);
+				break;
+			default:
+				throw new IllegalArgumentException("Grid for S is not correct!!!");
+			}
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 					
@@ -127,7 +128,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//if(antidominateAreaElementsCount>=k)
 			//	antidominateAreaElementsMoreThanK = true;
 		
-		//}
+		}
 		//else {
 			context.setStatus("Create GridW");
 			//System.out.println(context.getStatus());
@@ -190,23 +191,23 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//item.setItemType(ItemType.W);
 			context.getCounter(MyCounters.W).increment(1);
 			
-			//int[] range = gridS.getCount(item, q);
+			int[] range = gridS.getCount(item, q);
 			
-			//if(k < range[0])
-			//	context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
-			//else {
+			if(k < range[0])
+				context.getCounter(MyCounters.W_pruned_by_GridS).increment(1);
+			else {
 				//int reducerNumber = algorithmCutS.getGridW().getRelativeReducerNumber(item);
 				int reducerNumber = algorithmCutS.getReducerNumber(item, gridWSegmentation);
-			//	if(range[1] < k) {
+				if(range[1] < k) {
 					//item.setItemType(ItemType.W_InTopK);
-			//		context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
-			//		context.getCounter(MyCounters.W_in_RTOPk).increment(1);
-			//	}
-			//	else {
+					context.write(new MyKey(reducerNumber, ItemType.W_InTopK), item);
+					context.getCounter(MyCounters.W_in_RTOPk).increment(1);
+				}
+				else {
 					context.write(new MyKey(reducerNumber, ItemType.W), item);
 					context.getCounter(MyCounters.W1).increment(1);
-			//	}
-			//}
+				}
+			}
 			
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			
@@ -229,9 +230,9 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	
 	// Cleanup executed once at the end of the Mapper
 	// https://hadoop.apache.org/docs/current/api/org/apache/hadoop/mapreduce/Mapper.html
-	@Override
-	protected void cleanup(Mapper<Object, Text, MyKey, MyItem>.Context context) throws IOException, InterruptedException {
-		super.cleanup(context);
-	}
+	//@Override
+	//protected void cleanup(Mapper<Object, Text, MyKey, MyItem>.Context context) throws IOException, InterruptedException {
+	//	super.cleanup(context);
+	//}
 
 }

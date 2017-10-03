@@ -1,5 +1,6 @@
 package grids.gridsS;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -20,6 +21,12 @@ public class GridS_Simple extends GridS {
 	public GridS_Simple(URI gridSPath) throws IOException {
 		super();
 		FileParser.parseGridSFile(gridSPath, this);
+		cells.trimToSize();
+	}
+	
+	public GridS_Simple(BufferedReader gridReader) throws IOException {
+		super();
+		FileParser.parseGridSFile(gridReader, this);
 		cells.trimToSize();
 	}
 

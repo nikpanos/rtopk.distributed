@@ -3,7 +3,6 @@ package hadoopUtils;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 
@@ -16,8 +15,6 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Counter;
-import org.apache.hadoop.mapreduce.CounterGroup;
 import org.apache.hadoop.mapreduce.Reducer;
 
 import com.github.davidmoten.rtree.RTree;
@@ -33,16 +30,12 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	private static float[] q;
 	// The K of RTOPk
 	private static int k;
-
-	// The grid of dataset W
-	//private static AlgorithmCutS algorithmCutS;
 	
 	private int antidominateAreaCount = 0;
 	
 	private RTree<Object, Point> tree;
 	
 	private ArrayList<MyItem> datasetS;
-	//private ArrayList<MyItem> datasetW;
 	
 	private RtopkAlgorithm algorithm;
 	
@@ -51,8 +44,6 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 	@Override
 	protected void setup(Reducer<MyKey, MyItem, Text, Text>.Context context) throws IOException, InterruptedException {
 		super.setup(context);
-		
-		//int gridWSegmentation = context.getConfiguration().getInt("gridWSegmentation", 10);
 		
 		// initialize k
 		k = context.getConfiguration().getInt("K", 0);
@@ -66,33 +57,6 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		for (int i = 0; i < queryDimentions; i++) {
 			q[i] = context.getConfiguration().getFloat("queryDim" + i, 0);
 		}
-		
-		//URI gridWPath = context.getCacheFiles()[1];
-		//try {
-		//	gridWPath = new URI(new Path(gridWPath.getPath()).getName());
-		//} catch (IllegalArgumentException | URISyntaxException e) {
-		//	e.printStackTrace();
-		//}
-		
-		/*switch (context.getConfiguration().get("AlgorithmForS")) {
-		case "RealBounds":
-			algorithmCutS = new AlgorithmS_RealBounds(gridWSegmentation, q);
-			break;
-		case "Rlists":
-			algorithmCutS = new AlgorithmS_Rlists();
-			break;
-		case "NotRealBounds":
-			algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q);
-			break;
-		case "CompineNotRealBoundsAndRLists":
-			algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q);
-			break;
-		default:
-			throw new IllegalArgumentException("Algorithm for S is not correct!!!");
-		};
-
-		context.setStatus("GridW Created!!!");*/
-		//System.out.println(context.getStatus());
 		
 		String rtopkAlg = context.getConfiguration().get("AlgorithmForRtopk");
 		if (rtopkAlg.equals("BRS")) {
@@ -121,83 +85,83 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 		
 		//long startTime = System.nanoTime();
 		try {
-		MyItem myItem;
-		
-		if (key.getType() == ItemType.W_InTopK) {
-			for (MyItem mItem : values) {
-				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
-				context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
-				context.getCounter(MyCounters.RTOPk_Output).increment(1);
-				context.getCounter(MyCounters.W_topk_in_reducer).increment(1);
-				context.progress();
-			}
-		}
-		else if (key.getType() == ItemType.S_antidom) {
-			for (@SuppressWarnings("unused") MyItem mItem : values) {
-				context.getCounter(MyCounters.S_antidom_in_reducer).increment(1);
-				antidominateAreaCount++;
-				if (antidominateAreaCount >= k) {
-					break;
+			MyItem myItem;
+			
+			if (key.getType() == ItemType.W_InTopK) {
+				for (MyItem mItem : values) {
+					myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
+					context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
+					context.getCounter(MyCounters.RTOPk_Output).increment(1);
+					context.getCounter(MyCounters.W_topk_in_reducer).increment(1);
+					context.progress();
 				}
 			}
-		}
-		else if (key.getType() == ItemType.S) {
-			//algorithmCutS.setReducerKey(key.getKey());
-			for (MyItem mItem : values) {
-				context.getCounter(MyCounters.S2_in_reducer).increment(1);
-				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
-				/*if(algorithmCutS.isInLocalAntidominateArea(myItem)){
+			else if (key.getType() == ItemType.S_antidom) {
+				for (@SuppressWarnings("unused") MyItem mItem : values) {
+					context.getCounter(MyCounters.S_antidom_in_reducer).increment(1);
 					antidominateAreaCount++;
 					if (antidominateAreaCount >= k) {
 						break;
 					}
-					else {
-						continue;
+				}
+			}
+			else if (key.getType() == ItemType.S) {
+				//algorithmCutS.setReducerKey(key.getKey());
+				for (MyItem mItem : values) {
+					context.getCounter(MyCounters.S2_in_reducer).increment(1);
+					myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
+					/*if(algorithmCutS.isInLocalAntidominateArea(myItem)){
+						antidominateAreaCount++;
+						if (antidominateAreaCount >= k) {
+							break;
+						}
+						else {
+							continue;
+						}
+					}*/
+					
+					if (algorithm == RtopkAlgorithm.brs) {
+						tree = tree.add(null, Geometries.point(myItem.values));
 					}
-				}*/
-				
+					else if (algorithm == RtopkAlgorithm.rta) {
+						datasetS.add(myItem);
+					}
+					context.progress();
+				}
+			}
+			else {
+				BrsWithNewTree brs = null;
+				Rta rta = null;
 				if (algorithm == RtopkAlgorithm.brs) {
-					tree = tree.add(null, Geometries.point(myItem.values));
+					brs = new BrsWithNewTree(k - antidominateAreaCount);		
 				}
 				else if (algorithm == RtopkAlgorithm.rta) {
-					datasetS.add(myItem);
+					rta = new Rta();
 				}
-				context.progress();
-			}
-		}
-		else {
-			BrsWithNewTree brs = null;
-			Rta rta = null;
-			if (algorithm == RtopkAlgorithm.brs) {
-				brs = new BrsWithNewTree(k - antidominateAreaCount);		
-			}
-			else if (algorithm == RtopkAlgorithm.rta) {
-				rta = new Rta();
-			}
-			for (MyItem mItem : values) {
-				myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
-				context.getCounter(MyCounters.W2_in_reducer).increment(1);
-				//context.progress();
-				//brs = new BrsAlgorithm();
-				//long startTime = System.nanoTime();
-				if (algorithm == RtopkAlgorithm.brs) {
-					if (brs.isWeightVectorInRtopk(q, tree, myItem)) {
-						context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
-						context.getCounter(MyCounters.RTOPk_Output).increment(1);
+				for (MyItem mItem : values) {
+					myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
+					context.getCounter(MyCounters.W2_in_reducer).increment(1);
+					//context.progress();
+					//brs = new BrsAlgorithm();
+					//long startTime = System.nanoTime();
+					if (algorithm == RtopkAlgorithm.brs) {
+						if (brs.isWeightVectorInRtopk(q, tree, myItem)) {
+							context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
+							context.getCounter(MyCounters.RTOPk_Output).increment(1);
+						}
 					}
-				}
-				else if (algorithm == RtopkAlgorithm.rta) {
-					//datasetW.add(myItem);
-					if (rta.isWeightVectorInRtopk(datasetS, myItem, q, k - antidominateAreaCount)) {
-						context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
-						context.getCounter(MyCounters.RTOPk_Output).increment(1);
+					else if (algorithm == RtopkAlgorithm.rta) {
+						//datasetW.add(myItem);
+						if (rta.isWeightVectorInRtopk(datasetS, myItem, q, k - antidominateAreaCount)) {
+							context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
+							context.getCounter(MyCounters.RTOPk_Output).increment(1);
+						}
 					}
+					//long estimatedTime = System.nanoTime() - startTime;				
+					//context.getCounter(MyCounters.Time_BRS).increment(estimatedTime);
+					context.progress();
 				}
-				//long estimatedTime = System.nanoTime() - startTime;				
-				//context.getCounter(MyCounters.Time_BRS).increment(estimatedTime);
-				context.progress();
 			}
-		}
 		}
 		catch (Exception ex) {
 			Path debugPath = new Path("debug/a.txt");

@@ -1,5 +1,6 @@
 package grids.gridsS;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
 
@@ -30,6 +31,14 @@ public class GridS_RTree extends GridS {
 		tree = RTree.star().create();
 		this.k = k;
 		FileParser.parseGridSFile(gridSPath, this);
+	}
+	
+	public GridS_RTree(BufferedReader gridReader, float[] query, int k) throws IOException {
+		super();
+		this.q = query;
+		tree = RTree.star().create();
+		this.k = k;
+		FileParser.parseGridSFile(gridReader, this);
 	}
 
 	@Override

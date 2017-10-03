@@ -1,5 +1,6 @@
 package grids.gridsS;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -23,10 +24,17 @@ public class GridS_TreeDominateAndAntidominateArea extends GridS {
 		this.dimensionsNumber = dimensionsNumber;
 	}
 
-	public GridS_TreeDominateAndAntidominateArea(URI gridSPath,float[] query) throws IOException {
+	public GridS_TreeDominateAndAntidominateArea(URI gridSPath, float[] query) throws IOException {
 		super();
 		this.dimensionsNumber = query.length;
 		FileParser.parseGridSFile(gridSPath, this);
+		trimToSize(query);
+	}
+	
+	public GridS_TreeDominateAndAntidominateArea(BufferedReader gridReader, float[] query) throws IOException {
+		super();
+		this.dimensionsNumber = query.length;
+		FileParser.parseGridSFile(gridReader, this);
 		trimToSize(query);
 	}
 

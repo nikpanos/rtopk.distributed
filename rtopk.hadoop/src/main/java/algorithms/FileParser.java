@@ -76,63 +76,7 @@ public class FileParser {
 		return new MyItem(id, currentItemValues);
 	}
 	
-	/**
-	 * <h1>Create a Grid for dataset S</h1>
-	 * 
-	 * This method read a file that contains a grid for dataset S and create an object for this.
-	 * <br/>
-	 * The file must have this format (LB-lower bound,UP-upper bound):
-	 * <table>
-	 * <tbody>
-	 * <tr>
-	 * <th>id</th>
-	 * <th>Count</th>
-	 * <th>LB_dim1</th>
-	 * <th>LB_dim2</th>
-	 * <th>...</th>
-	 * <th>LB_dimN</th>
-	 * <th>UB_dim1</th>
-	 * <th>UB_dim2</th>
-	 * <th>...</th>
-	 * <th>UB_dimN</th>
-	 * </tr>
-	 * <tr>
-	 * <th>0</th>
-	 * <th>5</th>
-	 * <th>21.0</th>
-	 * <th>23.4</th>
-	 * <th>...</th>
-	 * <th>3.0</th>
-	 * <th>27.0</th>
-	 * <th>31.2</th>
-	 * <th>...</th>
-	 * <th>7.3</th>
-	 * </tr>
-	 * <tr>
-	 * <th>1</th>
-	 * <th>8</th>
-	 * <th>0.34</th>
-	 * <th>21.2</th>
-	 * <th>...</th>
-	 * <th>22.4</th>
-	 * <th>3.5</th>
-	 * <th>31.2</th>
-	 * <th>...</th>
-	 * <th>27.5</th>
-	 * </tr>
-	 * </tbody>
-	 * </table>
-	 * 
-	 * 
-	 * @param path the path of the file that contains the Grid
-	 * @param grid A Grid object
-	 * @throws IOException
-	 */
-	public static void parseGridSFile(URI path,GridS grid) throws IOException{
-				
-		File gridFile = new File(path.toString());
-		
-		BufferedReader in = new BufferedReader(new FileReader(gridFile));
+	public static void parseGridSFile(BufferedReader in, GridS grid) throws NumberFormatException, IOException {
 		String line;
 		StringTokenizer tokenizer;
 				
@@ -178,61 +122,24 @@ public class FileParser {
 			grid.add(cell);
 			
 		}
+	}
+	
+	
+	public static void parseGridSFile(URI path, GridS grid) throws IOException{
+				
+		File gridFile = new File(path.toString());
 		
-		// Close the BufferReader
-		in.close();
+		BufferedReader in = new BufferedReader(new FileReader(gridFile));
+		try {
+			parseGridSFile(in, grid);
+		}
+		finally {
+			// Close the BufferReader
+			in.close();
+		}
 		
 	}
 	
-	/**
-	 * <h1>Create a Grid for dataset W</h1>
-	 * 
-	 * This method read a file that contains a grid for dataset W and create an object for this.
-	 * <br/>
-	 * The file must have this format (LB-lower bound,UP-upper bound):
-	 * <table>
-	 * <tbody>
-	 * <tr>
-	 * <th>id</th>
-	 * <th>LB_dim1</th>
-	 * <th>LB_dim2</th>
-	 * <th>...</th>
-	 * <th>LB_dimN</th>
-	 * <th>UB_dim1</th>
-	 * <th>UB_dim2</th>
-	 * <th>...</th>
-	 * <th>UB_dimN</th>
-	 * </tr>
-	 * <tr>
-	 * <th>0</th>
-	 * <th>0.0</th>
-	 * <th>0.75</th>
-	 * <th>...</th>
-	 * <th>xyz</th>
-	 * <th>0.25</th>
-	 * <th>1.0</th>
-	 * <th>...</th>
-	 * <th>xyz</th>
-	 * </tr>
-	 * <tr>
-	 * <th>1</th>
-	 * <th>0.25</th>
-	 * <th>0.5</th>
-	 * <th>...</th>
-	 * <th>xyz</th>
-	 * <th>0.5</th>
-	 * <th>0.75</th>
-	 * <th>...</th>
-	 * <th>xyz</th>
-	 * </tr>
-	 * </tbody>
-	 * </table>
-	 * 
-	 * 
-	 * @param path the path of the file that contains the Grid
-	 * @param grid A Grid object
-	 * @throws IOException
-	 */
 	public static void parseGridWFullDimentionFile(URI path,GridW grid) throws IOException{
 				
 		File gridFile = new File(path.toString());

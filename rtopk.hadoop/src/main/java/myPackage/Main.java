@@ -30,6 +30,8 @@ public class Main {
 			try {
 				executeExpirement(status[i].getPath());
 			} catch (Exception e){
+				System.out.println(e.getMessage());
+				e.printStackTrace();
 				continue;
 			}
 		}

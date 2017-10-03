@@ -1,6 +1,8 @@
 package hadoopUtils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import org.apache.hadoop.conf.Configuration;
@@ -14,11 +16,26 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 
+import grids.gridsS.GridS;
 import hadoopUtils.input.CombineDocumentLineInputFormat;
 import model.MyItem;
 import model.MyKey;
 
 public class MyMapReduceDriver {
+	
+	private long getCountOfElementsInAntidominanceAreaOfGridS(Configuration conf, String fileName, float[] query, int k, String gridForS) throws IOException {
+		Path pt = new Path("hdfs://dnode1:8020/user/pnikitopoulos/" + fileName);
+		FileSystem fs = FileSystem.get(conf);
+		BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
+		GridS gridS = null;
+		try {
+			gridS = GridS.getGrid(gridForS, br, query, k);
+		}
+		finally {
+			br.close();
+		}
+		return gridS.getAntidominateAreaCount(query);
+	}
 
 	/**
 	 * <h1>Compute the RTOPk in a Hadoop cluster</h1>
@@ -46,20 +63,22 @@ public class MyMapReduceDriver {
 		Job job = Job.getInstance();
 
 		if (mapMemoryMB != -1) {
-			job.getConfiguration().set("mapreduce.map.memory.mb", mapMemoryMB + "");
+			int mapperMemory = (int) (((double)mapMemoryMB) * 1.25);
+			job.getConfiguration().set("mapreduce.map.memory.mb", mapperMemory + "");
 			job.getConfiguration().set("mapreduce.map.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx" + mapMemoryMB + "m");
 			//mapreduce.map.java.opts
 		}
 		
 		if (reduceMemoryMB != -1) {
-			job.getConfiguration().set("mapreduce.reduce.memory.mb", reduceMemoryMB + "");
+			int reducerMemory = (int) (((double)reduceMemoryMB) * 1.25);
+			job.getConfiguration().set("mapreduce.reduce.memory.mb", reducerMemory + "");
 			job.getConfiguration().set("mapreduce.reduce.java.opts", "-Djava.net.preferIPv4Stack=true -Xmx" + reduceMemoryMB + "m");
 			//mapreduce.reduce.java.opts
 		}
 		
 		long milliSeconds = 1000 * 60 * 60 * 3; //3 hours
 		//job.getConfiguration().setLong("mapreduce.task.timeout", milliSeconds);
-		job.getConfiguration().setLong("mapred.task.timeout", milliSeconds);
+		job.getConfiguration().setLong("mapreduce.task.timeout", milliSeconds);
 		
 		job.setJarByClass(MyMapReduceDriver.class);
 
@@ -126,28 +145,36 @@ public class MyMapReduceDriver {
 		
 		long startTime = System.currentTimeMillis();
 		
-		@SuppressWarnings("unused")
-		boolean success = job.waitForCompletion(true);
-		
-		long endTime = System.currentTimeMillis();
-		
-		Path resultsPath = new Path(pathOutput + Path.SEPARATOR + "Results.txt");
-		Configuration conf = job.getConfiguration();
-		FileSystem fs = FileSystem.get(conf);
-		OutputStream out = fs.create(resultsPath).getWrappedStream();
-		try {
-			out.write(new String("Total time elapsed (ms): " + (endTime - startTime) + "\n").getBytes());
-			for (CounterGroup group : job.getCounters()) {
-				out.write(new String("* Counter Group" + " \t" + group.getDisplayName() + "\n").getBytes());
-				out.write(new String(" number of counters in this group" + " \t" + group.size() + "\n").getBytes());
-				for (Counter counter : group) {
-					out.write(new String("- "+ counter.getDisplayName() + " \t "+counter.getValue() + "\n").getBytes());
+		long countAntidominate = getCountOfElementsInAntidominanceAreaOfGridS(job.getConfiguration(), pathGridS.toString(), query, k, gridForS);
+		if (countAntidominate > k) {
+			System.out.println("Result set is empty.");
+			System.out.println("Antidominate area count: " + countAntidominate);
+		}
+		else {
+			System.out.printf("Items in anti-dominance area of Grid S: %d\n", countAntidominate);
+			@SuppressWarnings("unused")
+			boolean success = job.waitForCompletion(true);
+			
+			long endTime = System.currentTimeMillis();
+			
+			Path resultsPath = new Path(pathOutput + Path.SEPARATOR + "Results.txt");
+			Configuration conf = job.getConfiguration();
+			FileSystem fs = FileSystem.get(conf);
+			OutputStream out = fs.create(resultsPath).getWrappedStream();
+			try {
+				out.write(new String("Total time elapsed (ms): " + (endTime - startTime) + "\n").getBytes());
+				for (CounterGroup group : job.getCounters()) {
+					out.write(new String("* Counter Group" + " \t" + group.getDisplayName() + "\n").getBytes());
+					out.write(new String(" number of counters in this group" + " \t" + group.size() + "\n").getBytes());
+					for (Counter counter : group) {
+						out.write(new String("- "+ counter.getDisplayName() + " \t "+counter.getValue() + "\n").getBytes());
+					}
 				}
 			}
-		}
-		finally {
-			out.close();
-			fs.close();
+			finally {
+				out.close();
+				fs.close();
+			}
 		}
 	}
 
