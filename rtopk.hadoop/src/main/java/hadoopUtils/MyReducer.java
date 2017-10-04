@@ -93,8 +93,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 					context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
 					context.getCounter(MyCounters.RTOPk_Output).increment(1);
 					context.getCounter(MyCounters.W_topk_in_reducer).increment(1);
-					context.getCounter(MyCounters.W2_in_reducer).increment(1);
-					context.progress();
+					//context.progress();
 				}
 			}
 			else if (key.getType() == ItemType.S_antidom) {
@@ -127,7 +126,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 					else if (algorithm == RtopkAlgorithm.rta) {
 						datasetS.add(myItem);
 					}
-					context.progress();
+					//context.progress();
 				}
 			}
 			else {
@@ -164,7 +163,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 					}
 					//long estimatedTime = System.nanoTime() - startTime;				
 					//context.getCounter(MyCounters.Time_BRS).increment(estimatedTime);
-					context.progress();
+					//context.progress();
 				}
 			}
 		}
