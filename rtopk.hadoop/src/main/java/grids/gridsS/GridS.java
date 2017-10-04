@@ -31,6 +31,9 @@ public abstract class GridS {
 			case "RTree":
 				gridS = new GridS_RTree(gridSPath, query, k);
 				break;
+			case "NoTree":
+				gridS = new GridS_NoProcess();
+				break;
 			default:
 				throw new IllegalArgumentException("Grid for S is not correct!!!");
 		}
@@ -53,7 +56,8 @@ public abstract class GridS {
 			case "TreeDominateAndAntidominateArea":
 				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath, query);			
 				break;
-			case "RTree":
+			case "RTree": //NoTree and RTree should be the same in this function (used by MyMapReduceDriver)
+			case "NoTree":
 				gridS = new GridS_RTree(gridSPath, query, k);
 				break;
 			default:

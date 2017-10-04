@@ -18,10 +18,6 @@ import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 import algorithms.Dominance;
 import algorithms.FileParser;
 import algorithms.cutS.AlgorithmCutS;
-import algorithms.cutS.AlgorithmS_CombineNotRealBoundsAndRLists;
-import algorithms.cutS.AlgorithmS_RealBounds;
-import algorithms.cutS.AlgorithmS_Rlists;
-import algorithms.cutS.AlgorithmsS_NotRealBounds;
 import grids.gridsS.*;
 
 public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
@@ -81,7 +77,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		}
 		
 		URI gridSPath = context.getCacheFiles()[0];
-		URI gridWPath = context.getCacheFiles()[0];
+		URI gridWPath = context.getCacheFiles()[1];
 		
 		try {
 			gridSPath = new URI(new Path(gridSPath.getPath()).getName());
@@ -96,25 +92,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			
 			// create the grid for dataset S
 			//long startTime = System.nanoTime();
-			switch (context.getConfiguration().get("GridForS")) {
-			case "Simple":
-				gridS = new GridS_Simple(gridSPath);
-				break;
-			case "DominateAndAntidominateArea":
-				gridS = new GridS_DominateAndAntidominateArea(gridSPath,q);			
-				break;
-			case "Tree":
-				gridS = new GridS_Tree(gridSPath,q);			
-				break;
-			case "TreeDominateAndAntidominateArea":
-				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath,q);			
-				break;
-			case "RTree":
-				gridS = new GridS_RTree(gridSPath, q, k);
-				break;
-			default:
-				throw new IllegalArgumentException("Grid for S is not correct!!!");
-			}
+			gridS = GridS.getGrid(context.getConfiguration().get("GridForS"), gridSPath, q, k);
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 					
@@ -130,28 +108,13 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 		
 		}
 		//else {
-			context.setStatus("Create GridW");
+			//context.setStatus("Create GridW");
 			//System.out.println(context.getStatus());
 			
-			switch (context.getConfiguration().get("AlgorithmForS")) {
-			case "RealBounds":
-				algorithmCutS = new AlgorithmS_RealBounds(gridWSegmentation, q, context);
-				break;
-			case "Rlists":
-				algorithmCutS = new AlgorithmS_Rlists(k,gridWPath,context);
-				break;
-			case "NotRealBounds":
-				algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, q, context);
-				break;
-			case "CompineNotRealBoundsAndRLists":
-				algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, q, context, k);
-				break;
-			default:
-				throw new IllegalArgumentException("Algorithm for S is not correct!!!");
-			}
+		algorithmCutS = AlgorithmCutS.getAlgorithmCutS(context.getConfiguration().get("AlgorithmForS"), gridWSegmentation, gridWPath, q, k, context);
 			
 	
-			context.setStatus("GridW Created!!!");
+			//context.setStatus("GridW Created!!!");
 			//System.out.println(context.getStatus());
 		//}
 	}

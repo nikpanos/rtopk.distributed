@@ -1,17 +1,44 @@
 package algorithms.cutS;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collections;
 import java.util.Comparator;
+
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapreduce.Mapper;
 
 import grids.gridsW.GridW;
 import model.Cell_W;
 import model.ItemType;
 import model.MyItem;
+import model.MyKey;
 
 public abstract class AlgorithmCutS {
 	
 	private static CellComparator comparator = new CellComparator();
+	
+	public static AlgorithmCutS getAlgorithmCutS(String algorithmName, int gridSegmentation, URI gridWPath, float[] query, int k, Mapper<Object, Text, MyKey, MyItem>.Context context) throws IOException {
+		AlgorithmCutS algorithmCutS;
+		switch (algorithmName) {
+		case "RealBounds":
+			algorithmCutS = new AlgorithmS_RealBounds(gridSegmentation, query, context);
+			break;
+		case "Rlists":
+			algorithmCutS = new AlgorithmS_Rlists(k,gridWPath,context);
+			break;
+		case "NotRealBounds":
+			algorithmCutS = new AlgorithmsS_NotRealBounds(gridWPath, query, context);
+			break;
+		case "CompineNotRealBoundsAndRLists":
+			algorithmCutS = new AlgorithmS_CombineNotRealBoundsAndRLists(gridWPath, query, context, k);
+			break;
+		default:
+			throw new IllegalArgumentException("Algorithm for S is not correct!!!");
+		}
+		
+		return algorithmCutS;
+	}
 
 	/**
 	 * The grid that the algorithm use

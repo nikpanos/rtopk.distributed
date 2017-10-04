@@ -93,6 +93,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 					context.write(new Text(Long.toString(myItem.getId())), myItem.valuesToText());
 					context.getCounter(MyCounters.RTOPk_Output).increment(1);
 					context.getCounter(MyCounters.W_topk_in_reducer).increment(1);
+					context.getCounter(MyCounters.W2_in_reducer).increment(1);
 					context.progress();
 				}
 			}
@@ -138,9 +139,13 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 				else if (algorithm == RtopkAlgorithm.rta) {
 					rta = new Rta();
 				}
+				int counter = 0;
 				for (MyItem mItem : values) {
 					myItem = new MyItem(mItem.getId(), mItem.getValues().clone());
 					context.getCounter(MyCounters.W2_in_reducer).increment(1);
+					if ((++counter % 1000) == 0) {
+						context.progress();
+					}
 					//context.progress();
 					//brs = new BrsAlgorithm();
 					//long startTime = System.nanoTime();

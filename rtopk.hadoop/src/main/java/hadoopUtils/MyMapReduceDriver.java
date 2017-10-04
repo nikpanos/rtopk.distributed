@@ -76,7 +76,7 @@ public class MyMapReduceDriver {
 			//mapreduce.reduce.java.opts
 		}
 		
-		long milliSeconds = 1000 * 60 * 60 * 3; //3 hours
+		long milliSeconds = 1000 * 60 * 60 * 1; //1 hour
 		//job.getConfiguration().setLong("mapreduce.task.timeout", milliSeconds);
 		job.getConfiguration().setLong("mapreduce.task.timeout", milliSeconds);
 		
@@ -91,7 +91,7 @@ public class MyMapReduceDriver {
 		job.getConfiguration().set("AlgorithmForRtopk", algorithmForRtopk);
 		job.getConfiguration().set("GridForS", gridForS);
 		job.getConfiguration().setInt("gridWSegmentation", gridWSegmentation);
-		//job.addCacheFile( pathGridS.toUri() );
+		job.addCacheFile( pathGridS.toUri() );
 		job.addCacheFile( pathGridW.toUri() );
 		
 		job.getConfiguration().setInt("queryDimentions", query.length);
