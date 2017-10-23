@@ -20,10 +20,16 @@ import model.MyItem;
 
 public class GridS_RTree extends GridS {
 	
-	private float[] q;
-	private int k;
-	private RTree<Integer, Rectangle> tree;
-	private int antidominateAreaCount = 0;
+	protected float[] q;
+	protected int k;
+	protected RTree<Integer, Rectangle> tree;
+	protected int antidominateAreaCount = 0;
+	
+	//private long cell_count = 0;
+	//private long used_cell_count = 0;
+	
+	//private long cells_checked_count = 0;
+	//private long comparisons_count = 0;
 	
 	public GridS_RTree(URI gridSPath, float[] query, int k) throws IOException {
 		super();
@@ -43,10 +49,12 @@ public class GridS_RTree extends GridS {
 
 	@Override
 	public void add(Cell_S cell) {
+		//cell_count++;
 		if (Dominance.dominateBoostQuery(q, cell.getUpperBound()) == -1) {
 			antidominateAreaCount += cell.getCount();
 		}
 		else if (Dominance.dominateBoostQuery(cell.getLowerBound(), q) != -1) {
+			//used_cell_count++;
 			tree = tree.add(cell.getCount(), Geometries.rectangle(cell.getLowerBound(), cell.getUpperBound()));
 		}
 	}
@@ -74,13 +82,17 @@ public class GridS_RTree extends GridS {
 		if (node instanceof Leaf) {
 			Leaf<Integer, Rectangle> l = (Leaf<Integer, Rectangle>)node;
 			for (Entry<Integer, Rectangle> e: l.entries()) {
-				//tmpScore = ;
+				//cells_checked_count++;
+				//comparisons_count++;
 				if (Functions.calculateScore(w, e.geometry().high()) <= scoreQ) {
 					result[0] += e.value();
 					result[1] += e.value();
 				}
-				else if (Functions.calculateScore(w, e.geometry().low()) < scoreQ) {
-					result[1] += e.value();
+				else {
+					//comparisons_count++;
+					if (Functions.calculateScore(w, e.geometry().low()) < scoreQ) {
+						result[1] += e.value();
+					}
 				}
 				if (result[0] >= k) {
 					break;
@@ -90,15 +102,20 @@ public class GridS_RTree extends GridS {
 		else {
 			NonLeaf<Integer, Rectangle> l = (NonLeaf<Integer, Rectangle>)node;
 			for (Node<Integer, Rectangle> child: l.children()) {
+				//cells_checked_count++;
+				//comparisons_count++;
 				if (Functions.calculateScore(w, child.geometry().mbr().high()) <= scoreQ) {
 					int count = getAllCount(child);
 					result[0] += count;
 					result[1] += count;
 				}
-				else if (Functions.calculateScore(w, child.geometry().mbr().low()) < scoreQ) {
-					int[] counts = getCountOfNode(w, child, scoreQ);
-					result[0] += counts[0];
-					result[1] += counts[1];
+				else {
+					//comparisons_count++;
+					if (Functions.calculateScore(w, child.geometry().mbr().low()) < scoreQ) {
+						int[] counts = getCountOfNode(w, child, scoreQ);
+						result[0] += counts[0];
+						result[1] += counts[1];
+					}
 				}
 				if (result[0] >= k) {
 					break;
@@ -121,5 +138,46 @@ public class GridS_RTree extends GridS {
 	public int getAntidominateAreaCount(float[] query) {
 		return antidominateAreaCount;
 	}
-
+	
+	public static void main(String[] args) throws IOException {
+		/*int k = 500;
+		float[] query = new float[] {52616, 52190, 52566, 52383};
+		String filenameGrid = "C:\\Users\\nikp\\Desktop\\100Suni4.grid5";
+		String filenameW = "C:\\Users\\nikp\\Desktop\\part-m-00098";
+		int prunedCount = 0, inRtopkCount = 0, otherCount = 0;
+		
+		long timeStart = System.currentTimeMillis(), timeRead;
+		
+		try (BufferedReader reader = new BufferedReader(new FileReader(filenameGrid))) {
+			GridS_RTree tree = new GridS_RTree(reader, query, k);
+			timeRead = System.currentTimeMillis();
+			
+			try (BufferedReader readerW = new BufferedReader(new FileReader(filenameW))) {
+				String line;
+				MyItem w;
+				while ((line = readerW.readLine()) != null) {
+					w = FileParser.parseDatasetElement(line);
+					int[] range = tree.getCount(w, query);
+					if(k < range[0])
+						prunedCount++;
+					else if(range[1] < k) {
+						inRtopkCount++;
+					}
+					else {
+						otherCount++;
+					}
+				}
+			}
+			System.out.printf("Cells in file: %d\nCells added in RTree: %d\nCells checked %d\n", tree.cell_count, tree.used_cell_count, tree.cells_checked_count);
+			System.out.printf("Comparisons count: %d\n", tree.comparisons_count);
+		}
+		long timeEnd = System.currentTimeMillis();
+		
+		
+		System.out.printf("Total execution time: %dms\n", timeEnd - timeStart);
+		System.out.printf("Time for creating RTree: %dms\n", timeRead - timeStart);
+		System.out.printf("Time for processing w tuples: %dms\n", timeEnd - timeRead);
+		System.out.printf("Tuples pruned: %d\nTuples in RTOPK: %d\nOther tuples: %d\n", prunedCount, inRtopkCount, otherCount);
+		*/
+	}
 }

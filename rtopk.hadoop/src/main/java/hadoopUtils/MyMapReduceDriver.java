@@ -24,7 +24,7 @@ import model.MyKey;
 public class MyMapReduceDriver {
 	
 	private long getCountOfElementsInAntidominanceAreaOfGridS(Configuration conf, String fileName, float[] query, int k, String gridForS) throws IOException {
-		Path pt = new Path("hdfs://dnode1:8020/user/pnikitopoulos/" + fileName);
+		Path pt = new Path("hdfs://dascosa16.idi.ntnu.no:8020/user/nikitopoulos/" + fileName);
 		FileSystem fs = FileSystem.get(conf);
 		BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
 		GridS gridS = null;
@@ -143,7 +143,7 @@ public class MyMapReduceDriver {
 		//job.getConfiguration().setBoolean(Job.MAP_OUTPUT_COMPRESS, true);
 		//job.getConfiguration().setClass(Job.MAP_OUTPUT_COMPRESS_CODEC, org.apache.hadoop.io.compress.SnappyCodec.class, CompressionCodec.class);
 		
-		long startTime = System.currentTimeMillis();
+		
 		
 		long countAntidominate = getCountOfElementsInAntidominanceAreaOfGridS(job.getConfiguration(), pathGridS.toString(), query, k, gridForS);
 		if (countAntidominate > k) {
@@ -152,9 +152,10 @@ public class MyMapReduceDriver {
 		}
 		else {
 			System.out.printf("Items in anti-dominance area of Grid S: %d\n", countAntidominate);
+			
+			long startTime = System.currentTimeMillis();
 			@SuppressWarnings("unused")
 			boolean success = job.waitForCompletion(true);
-			
 			long endTime = System.currentTimeMillis();
 			
 			Path resultsPath = new Path(pathOutput + Path.SEPARATOR + "Results.txt");
