@@ -1,11 +1,13 @@
 package hadoopUtils;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -35,6 +37,15 @@ public class MyMapReduceDriver {
 			br.close();
 		}
 		return gridS.getAntidominateAreaCount(query);
+	}
+	
+	public static void deleteOutput(FileSystem hdfs, Path directory) throws FileNotFoundException, IOException {
+		FileStatus[] status = hdfs.listStatus(directory);
+		for (int i = 0; i < status.length; i++) {
+			if (status[i].getPath().getName().startsWith("part-r-")) {
+				hdfs.delete(status[i].getPath(), false);
+			}
+		}
 	}
 
 	/**
@@ -171,6 +182,9 @@ public class MyMapReduceDriver {
 						out.write(new String("- "+ counter.getDisplayName() + " \t "+counter.getValue() + "\n").getBytes());
 					}
 				}
+				
+				deleteOutput(fs, pathOutput);
+				Thread.sleep(5000);
 			}
 			finally {
 				out.close();
