@@ -3,6 +3,7 @@ package hadoopUtils;
 import hadoopUtils.counters.MyCounters;
 
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
@@ -10,6 +11,8 @@ import model.ItemType;
 import model.MyItem;
 import model.MyKey;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
@@ -120,7 +123,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 	}
 
 	public void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-		
+		try {
 		MyItem item = FileParser.parseDatasetElement(value.toString());
 		// If the current element belongs to dataset S, then...
 		if (isReadingS) {
@@ -175,6 +178,27 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			
 			//context.getCounter(MyCounters.Total_effort_for_pruning_W_in_MilliSeconds).increment(estimatedTime);
+		}
+		}
+		catch (Exception ex) {
+			Path debugPath = new Path("debug/a.txt");
+			Configuration conf = context.getConfiguration();
+			FileSystem fs = FileSystem.get(conf);
+			try {
+				if (!fs.exists(debugPath)) {
+					PrintStream out = new PrintStream(fs.create(debugPath).getWrappedStream());
+					try {
+						out.append(ex.getMessage() + "\n");
+						ex.printStackTrace(out);
+					}
+					finally {
+						out.close();
+					}
+				}
+			}
+			finally {
+				fs.close();
+			}
 		}
 	}
 
