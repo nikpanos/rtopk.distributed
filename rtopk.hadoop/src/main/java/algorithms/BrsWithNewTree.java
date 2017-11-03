@@ -28,9 +28,9 @@ public class BrsWithNewTree {
 			return 0;
 		}
 		else {
-			if (buffer.size() < 2 * k) {
+			//if (buffer.size() < 2 * k) {
 				buffer.add(e.geometry());
-			}
+			//}
 			return 1;
 		}
 	}
@@ -93,12 +93,9 @@ public class BrsWithNewTree {
 		return count;
 	}
 	
-	public boolean isWeightVectorInRtopk(float[] queryPoint, RTree<Object, Point> tree, MyItem weight) {
-		if (k == 0) {
+	public boolean isWeightVectorInRtopk(MyItem queryPoint, RTree<Object, Point> tree, MyItem weight) {
+		if ((tree.size() == 0) || (k == 0)) {
 			return false;
-		}
-		else if (tree.size() < k) {
-			return true;
 		}
 		
 		this.weightVector = weight;
@@ -113,7 +110,7 @@ public class BrsWithNewTree {
 		//return processNodes(tree.getRoot());
 	}
 	
-	public List<MyItem> computeRTOPk(RTree<Object, Point> tree, MyItem[] W, float[] q) {
+	public List<MyItem> computeRTOPk(RTree<Object, Point> tree, MyItem[] W, MyItem q) {
 		
 		List<MyItem> result = new ArrayList<MyItem>();
 		for (int i = 0; i < W.length; i++) {

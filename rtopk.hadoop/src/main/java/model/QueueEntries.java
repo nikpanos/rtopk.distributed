@@ -2,9 +2,9 @@ package model;
 
 public class QueueEntries {
 	private RTree.Node node;
-	private float score;
+	private double score;
 	
-	public QueueEntries(RTree.Node node, float score) {
+	public QueueEntries(RTree.Node node, double score) {
 		this.node = node;
 		this.score = score;
 	}
@@ -17,11 +17,11 @@ public class QueueEntries {
 		this.node = node;
 	}
 
-	public float getScore() {
+	public double getScore() {
 		return score;
 	}
 
-	public void setScore(float score) {
+	public void setScore(double score) {
 		this.score = score;
 	}
 	

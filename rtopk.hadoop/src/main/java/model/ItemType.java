@@ -2,7 +2,7 @@ package model;
 
 public enum ItemType {
 	
-	W_InTopK(0), S_antidom(1), S(2), W(3);
+	W(0), S(1), W_InTopK(2);
     private final int value;
 
     private ItemType(int value) {

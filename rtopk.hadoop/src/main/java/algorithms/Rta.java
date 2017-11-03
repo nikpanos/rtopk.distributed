@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import model.ItemType;
 import model.MyItem;
 
 public class Rta {
@@ -12,10 +13,7 @@ public class Rta {
 	private S_Item_TopK[] buffer = null;
 	
 	public boolean isWeightVectorInRtopk(List<MyItem> s, MyItem w, float[] q, int k) {
-		if (k == 0) {
-			return false;
-		}
-		else if (s.size() < k) {
+		if (s.size() < k) {
 			return true;
 		}
 		
@@ -23,14 +21,15 @@ public class Rta {
 		if (buffer != null) {
 			threshold = findBufferMax(buffer, w);
 		}
-		float scoreq = Functions.calculateScore(w, q);
-		if (scoreq < threshold) {
+		float scoreq = Functions.calculateScore(w.values, q);
+		if (scoreq <= threshold) {
 			buffer = TopK(w, s, k, scoreq);
 			if (scoreq <= buffer[0].score) {
 				return true;
 			}
 		}
 		return false;
+		
 	}
 	
 	public List<MyItem> computeRTOPk(List<MyItem> S, MyItem[] W, float[] q, int k) {
@@ -104,7 +103,7 @@ public class Rta {
 		private float score;
 
 		private S_Item_TopK(MyItem item) {
-			super(item.getId(), item.values);
+			super(item.getId(), item.values, ItemType.S);
 		}
 
 	}

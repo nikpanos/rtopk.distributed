@@ -1,6 +1,8 @@
 package model;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,8 +28,8 @@ public class RTree {
 	
 	private int dimension_count = 4;
 	
-	private static final int RTREE_MAX_ENTRIES = 50;
-	private static final int RTREE_MIN_ENTRIES = 10;
+	private static final int RTREE_MAX_ENTRIES = 100;
+	private static final int RTREE_MIN_ENTRIES = 20;
 
 	private final int maxEntries;
 	private final int minEntries;
@@ -62,7 +64,7 @@ public class RTree {
 	}
 
 	public RTree(int maxEntries, int minEntries, int numDims) {
-		this(maxEntries, minEntries, numDims, SeedPicker.LINEAR);
+		this(maxEntries, minEntries, numDims, SeedPicker.QUADRATIC);
 	}
 
 	private Node buildRoot(boolean asLeaf) {
@@ -70,7 +72,7 @@ public class RTree {
 		float[] initDimensions = new float[dimension_count];
 		for (int i = 0; i < dimension_count; i++) {
 			initCoords[i] = (float) Math.sqrt(Float.MAX_VALUE);
-			initDimensions[i] = -2.0f * (float) Math.sqrt(Float.MAX_VALUE);
+			initDimensions[i] = 2.0f * (float) Math.sqrt(Float.MAX_VALUE);
 		}
 		return new Node(initCoords, initDimensions, asLeaf);
 	}
@@ -80,7 +82,7 @@ public class RTree {
 	 * minimum 2 entries per node 2 dimensions
 	 */
 	public RTree(int numDims) {
-		this(RTREE_MAX_ENTRIES, RTREE_MIN_ENTRIES, numDims, SeedPicker.LINEAR);
+		this(RTREE_MAX_ENTRIES, RTREE_MIN_ENTRIES, numDims, SeedPicker.QUADRATIC);
 	}
 
 	/**
@@ -164,7 +166,7 @@ public class RTree {
 		assert (dimensions.length == dimension_count);
 		Node l = findLeaf(root, coords, dimensions, entry);
 		if (l == null) {
-			//System.out.println("WTF?");
+			System.out.println("WTF?");
 			findLeaf(root, coords, dimensions, entry);
 		}
 		assert (l != null) : "Could not find leaf for entry to delete";
@@ -299,7 +301,7 @@ public class RTree {
 		for (int i = 0; i < dimension_count; i++) {
 			dims[i] = 0;
 		}
-		insert(entry.getFields(), dims, entry);
+		insert(entry.getValues(), dims, entry);
 	}
 
 	private void adjustTree(Node n, Node nn) {
@@ -636,12 +638,12 @@ public class RTree {
 			this.coords = new float[coords.length];
 			this.dimensions = new float[dimensions.length];
 			System.arraycopy(coords, 0, this.coords, 0, coords.length);
-			System.arraycopy(dimensions, 0, this.dimensions, 0,
-					dimensions.length);
+			System.arraycopy(dimensions, 0, this.dimensions, 0, dimensions.length);
 			this.leaf = leaf;
 			children = new LinkedList<Node>();
 			
 			high = new float[dimension_count];
+			fixHighVariable();
 		}
 
 		@Override
@@ -816,5 +818,37 @@ public class RTree {
 
 	public int getDimension_count() {
 		return dimension_count;
+	}
+	
+	private float getEuclideanDistanceFromOrigin(float[] p) {
+		float sum = 0;
+		for (int i = 0; i < p.length; i++) {
+			sum += p[i] * p[i];
+		}
+		return (float)Math.sqrt(sum);
+	}
+	
+	private void sortNode(Node parent, Comparator<Node> comp) {
+		Collections.sort(parent.children, comp);
+		for (Node child: parent.children) {
+			sortNode(child, comp);
+		}
+	}
+	
+	public void sort() {
+		sortNode(root, new Comparator<Node>() {
+			@Override
+			public int compare(Node o1, Node o2) {
+				float distance1 = getEuclideanDistanceFromOrigin(o1.getLow().values);
+				float distance2 = getEuclideanDistanceFromOrigin(o2.getLow().values);
+				if (distance1 < distance2) {
+					return -1;
+				}
+				else if (distance1 > distance2) {
+					return 1;
+				}
+				return 0;
+			}
+		});
 	}
 }

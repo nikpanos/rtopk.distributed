@@ -1,4 +1,4 @@
-package hadoopUtils.input;
+package input;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -69,6 +69,7 @@ public class DocumentLineRecordReader extends
 	private boolean isCompressedInput;
 	private Decompressor decompressor;
 	private byte[] recordDelimiterBytes;
+	// �� ���� ��� ��������� �� ��������� �� path ��� �������
 	private Path path1;
 
 	public DocumentLineRecordReader() {
@@ -88,6 +89,7 @@ public class DocumentLineRecordReader extends
 		end = start + split.getLength();
 		final Path file = split.getPath();
 		
+		// ������� �� path ��� �������
 		path1 = file;
 		
 		// open the file and seek to the start of the split
@@ -221,6 +223,7 @@ public class DocumentLineRecordReader extends
 
 	@Override
 	public DocumentLine getCurrentValue() {
+		// ������� ��� value �� path ��� �������
 		value.setFile(new Text(path1.getName().toString()));
 		return value;
 	}

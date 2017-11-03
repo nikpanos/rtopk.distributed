@@ -3,38 +3,56 @@ package model;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
-import java.util.Arrays;
 
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.Writable;
+
 
 public class MyItem implements Writable {
 
 	private long id;
 	public float[] values;
-	//private ItemType itemType = ItemType.S;
-
+	private ItemType itemType = ItemType.S;
+	
+	private double cosine;
+	
+	public void calculateCosine() {
+		double dotProduct = 0.0;
+	    double normA = 0.0;
+	    double normB = 0.0;
+	    for (int i = 0; i < values.length; i++) {
+	        dotProduct += values[i] / values.length;
+	        normA += Math.pow(values[i], 2);
+	        normB += Math.pow(1 / values.length, 2);
+	    }   
+	    cosine = dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+	}
+	
 	public MyItem() {
 		super();
 	}
-
-	public MyItem(long id) {
-		super();
-		this.id = id;
+	
+	public MyItem(MyItem other) {
+		this.id = other.id;
+		this.itemType = other.itemType;
+		this.values = other.values.clone();
 	}
-
-	public MyItem(long id, float[] values) {
-		super();
-		this.id = id;
-		this.values = values;
-	}
-
-	/*
-	 * To be used by the RTree component
-	 */
+	
 	public MyItem(float[] values) {
-		super();
 		this.values = values;
+	}
+	
+	public MyItem(long id, ItemType itemType) {
+		super();
+		this.id = id;
+		this.itemType = itemType;
+	}
+
+	public MyItem(long id, float[] values, ItemType itemType) {
+		super();
+		this.id = id;
+		this.values = values;
+		this.itemType = itemType;
 	}
 
 	public long getId() {
@@ -45,13 +63,6 @@ public class MyItem implements Writable {
 		this.id = id;
 	}
 
-	/*
-	 * For use in the RTree
-	 */
-	public float[] getFields() {
-		return values;
-	}
-
 	public float[] getValues() {
 		return values;
 	}
@@ -60,60 +71,44 @@ public class MyItem implements Writable {
 		this.values = values;
 	}
 
-	public Text valuesToText() {
-		String text = "[ ";
+	public ItemType getItemType() {
+		return itemType;
+	}
+
+	public void setItemType(ItemType itemType) {
+		this.itemType = itemType;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < values.length; i++) {
+			builder.append(values[i] + "\t");
+		}
+		return builder.toString();
+	}
+
+	public Text valuesToText(){
+		String text = "[ ";
+		for(int i=0;i<values.length;i++){
 			text += values[i];
-			if (i + 1 < values.length)
+			if(i+1<values.length)
 				text += " , ";
 		}
 		text += " ]";
 		return new Text(text);
 	}
-	/*
-	public String toString() {
-		StringBuilder builder;
-		switch (itemType) {
-		case S:
-			builder = new StringBuilder("S\t");
-			break;
-		case W:
-			builder = new StringBuilder("S\t");
-			break;
-		default:
-			builder = new StringBuilder("W_In_topk\t");
-			break;
-		}
-		
-		builder.append(id);
-		
-		for (int i = 0; i < values.length; i++) {
-			builder.append(values[i] + "\t");
-		}
-		
-		return builder.toString();
-	}*/
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#hashCode()
-	 */
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		//result = prime * result + ((itemType == null) ? 0 : itemType.hashCode());
-		result = prime * result + Arrays.hashCode(values);
+		result = prime * result + (int) id;
+		result = prime * result
+				+ ((itemType == null) ? 0 : itemType.hashCode());
 		return result;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
@@ -125,38 +120,49 @@ public class MyItem implements Writable {
 		MyItem other = (MyItem) obj;
 		if (id != other.id)
 			return false;
-		//if (itemType != other.itemType)
-		//	return false;
-		if (!Arrays.equals(values, other.values))
+		if (itemType != other.itemType)
 			return false;
 		return true;
 	}
 
 	@Override
 	public void readFields(DataInput input) throws IOException {
-		id = input.readLong();
-		/*int type = input.readByte();
-		if (type == 0)
+		id = input.readLong();		
+		if(input.readInt()==0)
 			itemType = ItemType.W;
-		else if (type == 1)
-			itemType = ItemType.S;
 		else
-			itemType = ItemType.W_InTopK;
-		*/
-		values = new float[input.readByte()];
-		for (int i = 0; i < values.length; i++) {
+			itemType = ItemType.S;
+		
+		int valuesNum = input.readInt();
+		values = new float[valuesNum];
+		for (int i = 0; i < valuesNum; i++) {
 			values[i] = input.readFloat();
 		}
+		
+		/*
+		ArrayWritable aw = new ArrayWritable(DoubleWritable.class);		
+		aw.readFields(input);
+		
+		Writable[] a = aw.get();
+		values = new double[a.length];
+		for(int i = 0; i < a.length;i++)
+			values[i] = (DoubleWritable) a[i];*/
 	}
 
 	@Override
 	public void write(DataOutput output) throws IOException {
 		output.writeLong(id);
-		//output.writeByte(itemType.getValue());
-		output.writeByte(values.length);
+		output.writeInt(itemType.getValue());
+		//ArrayWritable aw = new ArrayWritable(DoubleWritable.class,values);		
+		//aw.write(output);
+		output.writeInt(values.length);
 		for (int i = 0; i < values.length; i++) {
 			output.writeFloat(values[i]);
 		}
+	}
+
+	public double getCosine() {
+		return cosine;
 	}
 
 }

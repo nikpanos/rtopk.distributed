@@ -1,22 +1,33 @@
 package algorithms;
 
+import org.apache.hadoop.io.DoubleWritable;
+
 public class Dominance {
 
-	
-	public static int dominate(float p[],float q[])
+	/**
+	 * 
+	 * 1  - Tο p κυριαρχεί του q<br/>
+	 * -1 - Tο q κυριαρχεί του p<br/>
+	 * 0  - Tα q και p είναι ισόπαλα<br/>
+	 * 
+	 * @param p 
+	 * @param q
+	 * @return
+	 */
+	public static int dominate(float p[], float q[])
 	{
 		int dim = p.length;
 		if ( q.length != dim)
-			throw new IllegalArgumentException("Dimension out of range!");
+			throw new IllegalArgumentException("Dimension out of range!" + q.length + " " + p.length);
 
 		int counter1 = 0;
 		int counter2 = 0;
 		int counter3 = 0;
 		for (int i=0;i<dim;i++)
 		{			 
-			if ( p[i] == q[i]) counter1++;
-			else if (p[i] < q[i]) counter2++;
-			else counter3++;			
+			if ( p[i] == q[i]) counter1++;// ισόπαλα
+			else if (p[i] < q[i]) counter2++;// + για το p
+			else counter3++;			// + για το q
 		}
 		if (counter1==dim) return 0;
 		if (counter2+counter1==dim) return 1;
@@ -24,22 +35,32 @@ public class Dominance {
 		return 0;
 	}
 	
-	public static int dominateBoostQuery(float p[],float q[])
+	/**
+	 * 
+	 * 1  - Tο p κυριαρχεί του q<br/>
+	 * -1 - Tο q κυριαρχεί του p<br/>
+	 * 0  - Tα q και p είναι ισόπαλα<br/>
+	 * 
+	 * @param p 
+	 * @param q
+	 * @return
+	 */
+	public static int dominate(DoubleWritable p[],DoubleWritable q[])
 	{
 		int dim = p.length;
 		if ( q.length != dim)
-			throw new IllegalArgumentException("Dimension out of range!");
+			throw new IllegalArgumentException("Dimension out of range!" + q.length + " " + p.length);
 
 		int counter1 = 0;
 		int counter2 = 0;
 		int counter3 = 0;
 		for (int i=0;i<dim;i++)
 		{			 
-			if ( p[i] == q[i]) counter1++;
-			else if (p[i] < q[i]) counter2++;
+			if ( p[i].get() == q[i].get()) counter1++;
+			else if (p[i].get() < q[i].get()) counter2++;
 			else counter3++;			
 		}
-		if (counter1==dim) return -1;
+		if (counter1==dim) return 0;
 		if (counter2+counter1==dim) return 1;
 		if (counter3+counter1==dim) return -1;
 		return 0;

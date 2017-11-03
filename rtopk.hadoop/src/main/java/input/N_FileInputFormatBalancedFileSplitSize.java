@@ -1,4 +1,4 @@
-package hadoopUtils.input;
+package input;
 
 /**
  * Licensed to the Apache Software Foundation (ASF) under one
@@ -62,7 +62,7 @@ import com.google.common.collect.Lists;
  */
 @InterfaceAudience.Public
 @InterfaceStability.Stable
-public abstract class FileInputFormatBalancedFileSplitSize<K, V> extends InputFormat<K, V> {
+public abstract class N_FileInputFormatBalancedFileSplitSize<K, V> extends InputFormat<K, V> {
 	public static final String INPUT_DIR = "mapreduce.input.fileinputformat.inputdir";
 	public static final String SPLIT_MAXSIZE = "mapreduce.input.fileinputformat.split.maxsize";
 	public static final String SPLIT_MINSIZE = "mapreduce.input.fileinputformat.split.minsize";
@@ -72,9 +72,9 @@ public abstract class FileInputFormatBalancedFileSplitSize<K, V> extends InputFo
 	public static final String LIST_STATUS_NUM_THREADS = "mapreduce.input.fileinputformat.list-status.num-threads";
 	public static final int DEFAULT_LIST_STATUS_NUM_THREADS = 1;
 
-	private static final Log LOG = LogFactory.getLog(FileInputFormatBalancedFileSplitSize.class);
+	private static final Log LOG = LogFactory.getLog(N_FileInputFormatBalancedFileSplitSize.class);
 
-	//private static final double SPLIT_SLOP = 1.1; // 10% slop
+	private static final double SPLIT_SLOP = 1.1; // 10% slop
 
 	@Deprecated
 	public static enum Counter {
@@ -397,7 +397,7 @@ public abstract class FileInputFormatBalancedFileSplitSize<K, V> extends InputFo
 		// ��� �� ������ x1 = 2/3 ��� ��� �� x2 = 1/3. ��� �� �� split size ����� 30 MB ���� ���� split
 		// �� �������� 20 MB ��� �� x1 ������ ��� 10 MB ��� �� x2 ������.
 		double[] weightSplitSize = new double[files.size()];
-		// �� �������� ��� ������� ��� ��� ������� ����������� �� ����������� 
+		// �� �������� ��� ������� ��� � ������� ����������� �� ����������� 
 		// �� ������� ��� ����������� ��� ������� ��� split ��� ���� ������
 		long totalbytes = 0;
 
@@ -468,7 +468,7 @@ public abstract class FileInputFormatBalancedFileSplitSize<K, V> extends InputFo
 					blockSize[i] = files.get(i).getBlockSize();
 					// ���������� �� ������� ��� ��� ����� ��� ����������� ��� �� i ������ ��� splitSize 
 					weightSplitSize[i] = (double) length[i]/totalbytes;
-					//System.out.println("                        ------ split size percentage: " + weightSplitSize[i]);
+					System.out.println("                        ------ split size percentage: " + weightSplitSize[i]);
 					splitSize[i] = computeSplitSize(blockSize[i], minSize,
 							maxSize,weightSplitSize[i]);
 
