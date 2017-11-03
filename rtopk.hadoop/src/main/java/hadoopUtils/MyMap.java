@@ -199,6 +199,7 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			finally {
 				fs.close();
 			}
+			throw ex;
 		}
 	}
 

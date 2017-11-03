@@ -186,6 +186,7 @@ public class MyReducer extends Reducer<MyKey, MyItem, Text, Text> {
 			finally {
 				fs.close();
 			}
+			throw ex;
 		}
 		//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 		/*switch (key.getType()) {
