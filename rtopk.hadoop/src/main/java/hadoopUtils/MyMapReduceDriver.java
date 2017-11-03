@@ -26,6 +26,9 @@ import model.MyKey;
 public class MyMapReduceDriver {
 	
 	private long getCountOfElementsInAntidominanceAreaOfGridS(Configuration conf, String fileName, float[] query, int k, String gridForS) throws IOException {
+		if (gridForS.equals("NoTree")) {
+			return 0;
+		}
 		Path pt = new Path("hdfs://dascosa16.idi.ntnu.no:8020/user/nikitopoulos/" + fileName);
 		FileSystem fs = FileSystem.get(conf);
 		BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(pt)));
@@ -36,7 +39,12 @@ public class MyMapReduceDriver {
 		finally {
 			br.close();
 		}
-		return gridS.getAntidominateAreaCount(query);
+		if (gridS == null) {
+			return 0;
+		}
+		else {
+			return gridS.getAntidominateAreaCount(query);
+		}
 	}
 	
 	public static void deleteOutput(FileSystem hdfs, Path directory) throws FileNotFoundException, IOException {
@@ -100,10 +108,14 @@ public class MyMapReduceDriver {
 		job.getConfiguration().set("FileName_W", pathW.getName());
 		job.getConfiguration().set("AlgorithmForS", algorithmForS);
 		job.getConfiguration().set("AlgorithmForRtopk", algorithmForRtopk);
-		job.getConfiguration().set("GridForS", gridForS);
+		if (!gridForS.equals("NoTree")) {
+			job.getConfiguration().set("GridForS", gridForS);
+		}
 		job.getConfiguration().setInt("gridWSegmentation", gridWSegmentation);
-		job.addCacheFile( pathGridS.toUri() );
 		job.addCacheFile( pathGridW.toUri() );
+		if (!gridForS.equals("NoTree")) {
+			job.addCacheFile( pathGridS.toUri() );
+		}
 		
 		job.getConfiguration().setInt("queryDimentions", query.length);
 		for (int i = 0; i < query.length; i++) {

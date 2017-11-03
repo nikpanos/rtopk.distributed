@@ -57,6 +57,7 @@ public abstract class GridS {
 				gridS = new GridS_TreeDominateAndAntidominateArea(gridSPath, query);			
 				break;
 			case "RTree": //NoTree and RTree should be the same in this function (used by MyMapReduceDriver)
+				return null;
 			case "NoTree":
 				gridS = new GridS_RTree(gridSPath, query, k);
 				break;

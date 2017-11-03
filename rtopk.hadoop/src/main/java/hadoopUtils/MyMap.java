@@ -79,15 +79,8 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			q[i] = context.getConfiguration().getFloat("queryDim" + i, -1);
 		}
 		
-		URI gridSPath = context.getCacheFiles()[0];
-		URI gridWPath = context.getCacheFiles()[1];
 		
-		try {
-			gridSPath = new URI(new Path(gridSPath.getPath()).getName());
-			gridWPath = new URI(new Path(gridWPath.getPath()).getName());
-		} catch (IllegalArgumentException | URISyntaxException e) {
-			e.printStackTrace();
-		}
+		
 		
 		if (!isReadingS) {
 			//context.setStatus("Create GridS");
@@ -95,7 +88,15 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			
 			// create the grid for dataset S
 			//long startTime = System.nanoTime();
-			gridS = GridS.getGrid(context.getConfiguration().get("GridForS"), gridSPath, q, k);
+			try {
+				gridS = GridS.getGrid(context.getConfiguration().get("GridForS"), new URI(new Path(context.getCacheFiles()[1].getPath()).getName()), q, k);
+			} catch (IllegalArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (URISyntaxException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			//long estimatedTime = (System.nanoTime() - startTime) / 1000000000;
 			//context.getCounter(MyCounters.Total_effort_to_load_GridS_in_seconds).increment(estimatedTime);
 					
@@ -114,7 +115,15 @@ public class MyMap extends Mapper<Object, Text, MyKey, MyItem> {
 			//context.setStatus("Create GridW");
 			//System.out.println(context.getStatus());
 			
-		algorithmCutS = AlgorithmCutS.getAlgorithmCutS(context.getConfiguration().get("AlgorithmForS"), gridWSegmentation, gridWPath, q, k, context);
+		try {
+			algorithmCutS = AlgorithmCutS.getAlgorithmCutS(context.getConfiguration().get("AlgorithmForS"), gridWSegmentation, new URI(new Path(context.getCacheFiles()[0].getPath()).getName()), q, k, context);
+		} catch (IllegalArgumentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 			
 	
 			//context.setStatus("GridW Created!!!");

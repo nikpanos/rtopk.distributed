@@ -5,7 +5,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import gr.unipi.generators.UniformGenerator;
 import model.MyItem;
 
 public class Rta {
@@ -119,37 +118,6 @@ public class Rta {
 				return 1;
 			else
 				return 0;
-		}
-	}
-	
-	public static void main(String[] args) {
-		int dimensions = 4;
-		int countS = 27473548;
-		int countW = 30474;
-		int k = 7;
-		
-		float[] query = new float[]{7409342.0f, 223848.8f, 969.17145f, 24222.133f};
-		UniformGenerator gen = new UniformGenerator(dimensions);
-		ArrayList<MyItem> S = new ArrayList<MyItem>();
-		int count = 0;
-		while (count < countS) {
-			float[] p = gen.nextPoint(10000000);
-			if (Dominance.dominate(p, query) >= 0) {
-				S.add(new MyItem(p));
-				count++;
-			}
-		}
-		
-		Rta rta = new Rta();
-		
-		for (int i = 0; i < countW; i++) {
-			MyItem w = new MyItem(gen.nextNormalizedPointF());
-			if (rta.isWeightVectorInRtopk(S, w, query, k)) {
-				System.out.println(i + " it is!");
-			}
-			else {
-				System.out.println(i + " it is not!");
-			}
 		}
 	}
 
